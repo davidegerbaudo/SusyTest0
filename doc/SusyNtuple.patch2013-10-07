@@ -1,0 +1,8 @@
+Index: Root/SusyNtTools.cxx
+===================================================================
+303c303
+<     if(mu->Pt() < MUON_PT_CUT) continue;
+---
+>     //if(mu->Pt() < MUON_PT_CUT) continue; // DG test low-pt mu
+365a366
+>     if(mu->Pt() < MUON_PT_CUT) continue; // DG test (move pt cut from baseline to signal)
