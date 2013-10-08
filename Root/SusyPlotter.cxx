@@ -1,4 +1,6 @@
 #include <cassert>
+#include <algorithm> // count_if
+#include <functional> // unary_function
 
 #include "SusyTest0/SusyPlotter.h"
 
@@ -6,6 +8,7 @@
 
 #include "SusyNtuple/SusyDefs.h"
 #include "SusyTest0/criteria.h"
+#include "SusyTest0/utils.h"
 #include "SusyMatrixMethod/DiLeptonMatrixMethod.h"
 
 using namespace std;
@@ -108,6 +111,7 @@ Bool_t SusyPlotter::Process(Long64_t entry)
   increment(n_readin, m_weightComponents);
   bool removeLepsFromIso(false);
   selectObjects(NtSys_NOM, removeLepsFromIso, TauID_medium);
+  extractTtbarTruth();
   if(!selectEvent())    return kTRUE;
   const Met*          m = m_met;
   const JetVector&    j = m_signalJets2Lep;
@@ -468,5 +472,37 @@ void SusyPlotter::initHistos()
       }// end loop over systematics
     }// end loop over channels
   }// end loop over Plot regions
+}
+//-----------------------------------------
+struct bCounter : std::unary_function<const Susy::TruthParticle&, const bool>
+{
+  const bool operator()(const Susy::TruthParticle& p) const {
+    return (p.pdgId==+5 || p.pdgId==-5);
+  }
+};
+struct isB {
+  bool operator()(const Susy::TruthParticle &p) const { return (p.pdgId==+5 || p.pdgId==-5); }
+};
+int get_pdg(const Susy::TruthParticle &p) { return p.pdgId; }
+void SusyPlotter::extractTtbarTruth()
+{
+  uint run(nt.evt()->run), evt(nt.evt()->event);
+//   D3PDReader::VarHandle< std::vector<TruthParticle>* > tpr;
+//   const std::vector<TruthParticle> &truthParts = nt.tpr;
+
+  int nb=0;
+  std::vector<Susy::TruthParticle>::const_iterator it  = nt.tpr()->begin();
+  std::vector<Susy::TruthParticle>::const_iterator end = nt.tpr()->end();
+  nb = std::count_if(it, end, isB());//bCounter());
+  std::vector<int> pdgs; pdgs.resize(nt.tpr()->size());
+  std::transform (it, end, pdgs.begin(), get_pdg);
+  cout<<"run "<<run<<" evt "<<evt<<" there are "
+      <<nt.tpr()->size()
+    //      <<truthParts.size()
+      <<" truth particles"
+      <<" out of which "<<std::count_if(it, end, bCounter())<<" b"
+      <<" or "<<std::count_if(it, end, isB())
+      <<" pdgs: "<<vint2str(pdgs)
+      <<endl;
 }
 //-----------------------------------------
