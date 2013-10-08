@@ -112,6 +112,7 @@ Bool_t SusyPlotter::Process(Long64_t entry)
   bool removeLepsFromIso(false);
   selectObjects(NtSys_NOM, removeLepsFromIso, TauID_medium);
   extractTtbarTruth();
+  findBaseMuonCloseToJets();
   if(!selectEvent())    return kTRUE;
   const Met*          m = m_met;
   const JetVector&    j = m_signalJets2Lep;
@@ -491,3 +492,47 @@ void SusyPlotter::extractTtbarTruth()
       <<endl;
 }
 //-----------------------------------------
+struct JetMuonPair {
+  const Susy::Jet *jet;
+  const Susy::Muon *mu;
+  JetMuonPair() : jet(0), mu(0) {}
+  JetMuonPair(const Susy::Jet &j, const Susy::Muon &m) : jet(&j), mu(&m) {}
+};
+struct NearestMuon : public unary_function<const Susy::Muon*, void> {
+  const Susy::Jet *jet_;
+  const Susy::Muon *mu_;
+  double dr_;
+  NearestMuon(const Susy::Jet *jet) : jet_(jet), mu_(0), dr_(FLT_MAX) {}
+  void operator() (const Susy::Muon* mu) {
+    if(jet_ && mu) { double dr(jet_->DeltaR(*mu)); if(dr<dr_) { mu_=mu; dr_=dr; } }
+  }
+};
+struct NearestMuonFinder : public unary_function<const Susy::Jet*, JetMuonPair> {
+  NearestMuonFinder(const MuonVector& muons) : muons_(muons) {}
+  const MuonVector& muons_;
+  JetMuonPair operator() (const Susy::Jet *jet) {
+    JetMuonPair jm;
+    if(jet) {
+      jm.jet = jet;
+      jm.mu = (std::for_each(muons_.begin(), muons_.end(), NearestMuon(jet))).mu_;
+    }
+    return jm;
+  }
+};
+void SusyPlotter::findBaseMuonCloseToJets()
+{
+  const JetVector& jets   = m_signalJets2Lep;
+  const MuonVector& muons = m_baseMuons;
+  cout<<"m_baseMuons["<<m_baseMuons.size()<<"], m_signalMuons["<<m_signalMuons.size()<<"]"<<endl;
+  vector<JetMuonPair> jms(jets.size());
+  std::transform(jets.begin(), jets.end(), jms.begin(), NearestMuonFinder(muons));
+  cout<<"vector<JetMuonPair> "<<jms.size()<<endl;
+  for(size_t i=0; i<jms.size(); ++i) {
+    const Susy::Jet *j = jms[i].jet;
+    const Susy::Muon *m = jms[i].mu;
+    cout<<"["<<i<<"]"
+        <<" j("<<(j ? j->Eta() : 0.0)<<", "<<(j ? j->Phi() : 0.0)<<") "<<(j ? j->Pt() : 0.0)
+        <<" m("<<(m ? m->Eta() : 0.0)<<", "<<(m ? m->Phi() : 0.0)<<") "<<(m ? m->Pt() : 0.0)
+        <<endl;
+  }
+}

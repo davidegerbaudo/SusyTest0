@@ -40,6 +40,7 @@ class SusyPlotter : public SusySelection
   void initNames(); // initialize enum literals; should be static, but rootcint cannot deal with it
   void initHistos();
   void extractTtbarTruth();
+  void findBaseMuonCloseToJets();
  public:
   SusyPlotter& setOutputFilename(const std::string &name);
   
