@@ -69,8 +69,13 @@ Bool_t SusySelection::Process(Long64_t entry)
   const JetVector&   bj = m_baseJets;
   const LeptonVector& l = m_signalLeptons;
   if(l.size()>1) computeNonStaticWeightComponents(l, bj); else return false;
-  passSrSs(WH_SRSS1, m_signalLeptons, m_signalTaus, m_signalJets2Lep, m_met, allowQflip);
-
+  if(susy::pass2LepPt(l, 30.0, 20.0))
+      cout<<" run : "<<nt.evt()->run
+          <<" event : "<<nt.evt()->isMC
+          <<" weight : "<<m_weightComponents.product()
+          <<" components : "<<m_weightComponents.str()
+          <<endl;
+  //passSrSs(WH_SRSS1, m_signalLeptons, m_signalTaus, m_signalJets2Lep, m_met, allowQflip);
   return kTRUE;
 }
 //-----------------------------------------
