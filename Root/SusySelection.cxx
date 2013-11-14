@@ -71,7 +71,7 @@ Bool_t SusySelection::Process(Long64_t entry)
   if(l.size()>1) computeNonStaticWeightComponents(l, bj); else return false;
   if(susy::pass2LepPt(l, 30.0, 20.0))
       cout<<" run : "<<nt.evt()->run
-          <<" event : "<<nt.evt()->isMC
+          <<" event : "<<nt.evt()->event
           <<" weight : "<<m_weightComponents.product()
           <<" components : "<<m_weightComponents.str()
           <<endl;
