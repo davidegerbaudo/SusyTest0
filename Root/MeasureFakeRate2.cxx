@@ -5,6 +5,7 @@
 #include "SusyTest0/kinematic.h"
 #include "SusyTest0/utils.h"
 
+#include <cassert>
 #include "LeptonTruthTools/RecoTruthMatch.h"
 
 #include <algorithm> // transform
