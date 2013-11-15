@@ -26,7 +26,6 @@ std::string SusySelection::WeightComponents::str() const
 }
 //-----------------------------------------
 SusySelection::SusySelection() :
-  m_susyObj(NULL),
   m_xsReader(NULL),
   m_trigObj(NULL),
   m_useMCTrig(false),

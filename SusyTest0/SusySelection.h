@@ -133,7 +133,6 @@ class SusySelection : public SusyNtAna
 
   protected:
 
-    SUSYObjDef* m_susyObj;            // susy obj
     XSReader* m_xsReader;
 
     DilTrigLogic*       m_trigObj;      // My trigger logic class
