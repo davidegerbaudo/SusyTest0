@@ -7,6 +7,8 @@
 #include "SusyTest0/SelectionRegions.h"
 #include "SusyTest0/criteria.h"
 
+#include <cassert>
+
 using namespace susywh; // pull in SelectionRegions
 const int controlRegions[] = {
   kCR_Real, kCR_SideLow, kCR_SideHigh, kCR_HF, kCR_HF_high,
