@@ -24,8 +24,6 @@
 #include "SusyTest0/SusyAnaDefsMatt.h"
 #include "SusyTest0/SsPassFlags.h"
 
-#include "SUSYTools/SUSYObjDef.h"
-
 #include <fstream>
 
 enum WeightType
