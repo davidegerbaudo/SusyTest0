@@ -12,7 +12,6 @@ using namespace Susy;
 // SusySelectionMatt Constructor
 /*--------------------------------------------------------------------------------*/
 SusySelectionMatt::SusySelectionMatt() :
-  m_susyObj(NULL),
   m_trigObj(NULL),
   m_useMCTrig(false),
   m_fileName("default"),

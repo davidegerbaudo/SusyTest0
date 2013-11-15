@@ -272,7 +272,6 @@ class SusySelectionMatt : public SusyNtAna
 
   protected:
 
-    SUSYObjDef* m_susyObj;            // susy obj
 
     DilTrigLogic*       m_trigObj;      // My trigger logic class
     bool                m_useMCTrig;    // Use MC Trigger
