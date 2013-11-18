@@ -57,6 +57,15 @@ void SusySelection::Begin(TTree* /*tree*/)
   } // end if(m_useXsReader)
 }
 //-----------------------------------------
+bool isHighPuEvent(int eventNumber)
+{ // these are the events that seem to have a very low pu weight
+  int highPuEvents [] = {45816,45817,2016004,2016005,2016006,2016008};
+  const int nHighPuEvents = sizeof(highPuEvents) / sizeof(highPuEvents[0]);
+  const int* begin = highPuEvents;
+  const int* end   = highPuEvents + nHighPuEvents;
+  const int* it    = std::find(begin, end, eventNumber);
+  return it!=end;
+}
 Bool_t SusySelection::Process(Long64_t entry)
 {
   m_printer.countAndPrint(cout);
