@@ -18,6 +18,7 @@ std::string SusySelection::WeightComponents::str() const
 {
   std::ostringstream oss;
   oss<<" susynt: "<<susynt
+     <<" (gen "<<gen<<" * "<<pileup<<" * "<<norm<<")"
      <<" lepSf: "<<lepSf
      <<" btag: "<<btag
      <<" trigger: "<<trigger
