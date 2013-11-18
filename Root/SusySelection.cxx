@@ -79,7 +79,8 @@ Bool_t SusySelection::Process(Long64_t entry)
   const JetVector&   bj = m_baseJets;
   const LeptonVector& l = m_signalLeptons;
   if(l.size()>1) computeNonStaticWeightComponents(l, bj); else return false;
-  if(susy::pass2LepPt(l, 30.0, 20.0))
+  if((entry<1024 || isHighPuEvent(nt.evt()->event))
+      && susy::pass2LepPt(l, 30.0, 20.0))
       cout<<" run : "<<nt.evt()->run
           <<" event : "<<nt.evt()->event
           <<" weight : "<<m_weightComponents.product()
