@@ -17,6 +17,7 @@ std::string SusySelection::WeightComponents::str() const
 {
   std::ostringstream oss;
   oss<<" susynt: "<<susynt
+     <<" (gen "<<gen<<" * "<<pileup<<" * "<<norm<<")"
      <<" lepSf: "<<lepSf
      <<" btag: "<<btag
      <<" trigger: "<<trigger
@@ -54,6 +55,15 @@ void SusySelection::Begin(TTree* /*tree*/)
   } // end if(m_useXsReader)
 }
 //-----------------------------------------
+bool isHighPuEvent(int eventNumber)
+{ // these are the events that seem to have a very low pu weight
+  int highPuEvents [] = {45816,45817,2016004,2016005,2016006,2016008};
+  const int nHighPuEvents = sizeof(highPuEvents) / sizeof(highPuEvents[0]);
+  const int* begin = highPuEvents;
+  const int* end   = highPuEvents + nHighPuEvents;
+  const int* it    = std::find(begin, end, eventNumber);
+  return it!=end;
+}
 Bool_t SusySelection::Process(Long64_t entry)
 {
   m_printer.countAndPrint(cout);
@@ -67,8 +77,16 @@ Bool_t SusySelection::Process(Long64_t entry)
   const JetVector&   bj = m_baseJets;
   const LeptonVector& l = m_signalLeptons;
   if(l.size()>1) computeNonStaticWeightComponents(l, bj); else return false;
-  passSrSs(WH_SRSS1, m_signalLeptons, m_signalTaus, m_signalJets2Lep, m_met, allowQflip);
-
+  if((entry<1024 || isHighPuEvent(nt.evt()->event))
+      && susy::pass2LepPt(l, 30.0, 20.0))
+      cout<<" run : "<<nt.evt()->run
+          <<" event : "<<nt.evt()->event
+          <<" weight : "<<m_weightComponents.product()
+          <<" components : "<<m_weightComponents.str()
+          <<endl;
+  if(susy::pass2LepPt(l, 30.0, 20.0))
+      increment(n_pass_lepPt[getDiLepEvtType(l)], m_weightComponents);
+  //passSrSs(WH_SRSS1, m_signalLeptons, m_signalTaus, m_signalJets2Lep, m_met, allowQflip);
   return kTRUE;
 }
 //-----------------------------------------

@@ -1,0 +1,430 @@
+Warning in <TClassTable::Add>: class Root::TAccept already in TClassTable
+Warning in <TClassTable::Add>: class Root::TSelectorToolBase already in TClassTable
+Warning in <TClassTable::Add>: class pair<string,TH1F*> already in TClassTable
+Warning in <TClassTable::Add>: class pair<string,TH1D*> already in TClassTable
+Warning in <TClassTable::Add>: class pair<double,double> already in TClassTable
+Warning in <TClassTable::Add>: class BTagCalib already in TClassTable
+flags:
+  sample  
+  nEvt    1024
+  nSkip   0
+  dbg     0
+  input   /gdata/atlas/ucintprod/SusyNt/data12_n0145//user.sfarrell.group.phys-susy.data12_8TeV.periodA.physics_Muons.PhysCont.SusyNt.repro14_v01_p1542_n0145/user.sfarrell.116578._00001.susyNt.root
+  output  
+
+
+On-the-fly sumw computation:
+mcid: 0 sumw: 288881
+Total entries:   89473
+Process entries: 1024
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Initializing DilTrigLogic:
+	period for Weights: Moriond
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+DGTriggerReweight: using root files in directory: $ROOTCOREDIR/../DGTriggerReweight/data, for data periods Moriond, use ReweightUtils = false
+DGTriggerReweight: initializeReweightUtils = false, will initialize Tables only.
+DGTriggerReweight: hard coded: dimuon+MET trigger is not used.
+period match for Moriond
+m_luminositySum= 0.794016
+m_luminositySum= 1.09041
+m_luminositySum= 3.04411
+m_luminositySum= 5.88483
+m_luminositySum= 8.97213
+m_luminositySum= 9.7633
+m_luminositySum= 12.5345
+m_luminositySum= 13.1054
+m_luminositySum= 14.3797
+m_luminositySum= 15.8246
+m_luminositySum= 16.8409
+m_luminositySum= 19.4372
+m_luminositySum= 20.277
+m_luminositySum= 20.277
+trigger weights file: $ROOTCOREDIR/../DGTriggerReweight/data/muon_maps_A_G_p1181_I_L_p1328_WithoutSignalJets_1bin.root
+trigger weights file: $ROOTCOREDIR/../DGTriggerReweight/data/grl_v47-periodA_efficiencies.root
+trigger weights file: $ROOTCOREDIR/../DGTriggerReweight/data/grl_v47-periodB1_B3_efficiencies.root
+trigger weights file: $ROOTCOREDIR/../DGTriggerReweight/data/grl_v47-periodB4_B8_efficiencies.root
+trigger weights file: $ROOTCOREDIR/../DGTriggerReweight/data/grl_v47-periodB9_B14_efficiencies.root
+trigger weights file: $ROOTCOREDIR/../DGTriggerReweight/data/grl_v47-C-D3_efficiencies.root
+trigger weights file: $ROOTCOREDIR/../DGTriggerReweight/data/grl_v47-D4-D7_efficiencies.root
+trigger weights file: $ROOTCOREDIR/../DGTriggerReweight/data/grl_v47-periodD8-E3_efficiencies.root
+trigger weights file: $ROOTCOREDIR/../DGTriggerReweight/data/IJL_efficiencies.root
+trigger weights file: $ROOTCOREDIR/../DGTriggerReweight/data/eff_2d.root
+DGTriggerReweight: tableInitializeMM(), file: $ROOTCOREDIR/../DGTriggerReweight/data/muon_maps_A_G_p1181_I_L_p1328_WithoutSignalJets_1bin.root
+small stat: out of 4680, EF_mu13: 241, EF_mu18_tight: 241, EF_mu8_EFFS: 241, EF_mu8_EFFS_NOT_EF_mu18_tight: 520, EF_mu8_EFFS_COND_EF_mu18_tight: 1259, EF_mu8_EFFS_NOT_EF_mu13: 738, EF_mu18_tight_NOtype: 241, EF_mu8_EFFS_NOT_EF_mu13: 241, EF_xe40wMu: 12
+if no other MM low stat warnings, all low stat bins were fixed using average over phi
+DGTriggerReweight: tableInitializeEE()
+small stat: out of 5280, EF_e12_loose: 116, EF_e12Tvh_medium1: 116, EF_e24vh_medium1: 116, EF_e7_medium1: 116 
+if no other small stat warnings, small stat bins were all fixed by using eta-average of all sufficient-stats bins.
+triggerReweight2Lep::initialize() SUCCESSFULL
+DGTriggerReweight: If pT or eta of a lepton exceeds the range defined for the trigger maps, it is automatically set to the maximum/minimum value
+Entry                1                        Mon Nov 18 15:39:48 2013
+
+ run : 200913 event : 1825034 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 1707371 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 1762918 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 1867751 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 1904987 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 1961384 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 1976132 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2072006 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+Entry              256                        Mon Nov 18 15:39:48 2013
+
+ run : 200913 event : 2151456 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2117801 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2097950 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2109658 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2188914 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2273743 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2307568 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2320056 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2215321 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2212339 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2317580 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2264909 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2350339 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+Entry              512                        Mon Nov 18 15:39:48 2013
+
+ run : 200913 event : 2461945 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2419852 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2443775 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2482322 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2499473 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2542751 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2586795 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2539368 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2642138 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2661040 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2692869 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2711022 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2638118 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2687485 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2787401 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2801564 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2896807 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+ run : 200913 event : 2916622 weight : 1 components :  susynt: 1 (gen 1 * 1 * 1) lepSf: 1 btag: 1 trigger: 1 qflip: 1 fake: 1
+Entry             1024                        Mon Nov 18 15:39:48 2013
+
+
+---------------------------------------------------
+ Number of events processed: 0 
+	 Analysis time: Real 0:00:00, CPU 0.190      
+	 Analysis speed [kHz]: 0.000                     
+---------------------------------------------------
+
+****************************************
+Event counts for weight: Raw
+----------------------------------------
+input:           :       1024
+GRL              :       1024
+LarErr           :       1024
+TileErr          :       1024
+TTCVeto          :       1024
+GoodVtx          :       1024
+TileTripCut      :       1024
+LAr:             :       1024
+BadJet:          :       1019
+FEB:             :       1019
+BadMu:           :       1019
+Cosmic:          :        982
+hfor:            :        982
+Htautau veto     :          0
+atleast 2        :         74
+exactly 2        :         74
+mll              :         67
+nSigLep          :          0
+   ------  Start Comparison Here ------ 
+Dilepton type    :         ee        mm        em        me     em+me
+category         :          0         0         0         0         0
+nSigLep          :          0         0         0         0         0
+tauVeto          :          0         0         0         0         0
+trig:            :          0         0         0         0         0
+trig match:      :          0         0         0         0         0
+mc prompt2l      :          0         0         0         0         0
+SS:              :          0         0         0         0         0
+muIso            :          0         0         0         0         0
+elD0Sig          :          0         0         0         0         0
+fjVeto           :          0         0         0         0         0
+bjVeto           :          0         0         0         0         0
+ge1j             :          0         0         0         0         0
+lepPt            :          0         0         0         0         0
+mllZveto         :          0         0         0         0         0
+mWwt             :          0         0         0         0         0
+ht               :          0         0         0         0         0
+metRel           :          0         0         0         0         0
+----------------------------------------
+mllMin           :          0         0         0         0         0
+flavor:          :          0         0         0         0         0
+OS:              :          0         0         0         0         0
+----------------------------------------
+****************************************
+Event counts for weight: Event
+----------------------------------------
+input:           :       1024
+GRL              :       1024
+LarErr           :       1024
+TileErr          :       1024
+TTCVeto          :       1024
+GoodVtx          :       1024
+TileTripCut      :       1024
+LAr:             :       1024
+BadJet:          :       1019
+FEB:             :       1019
+BadMu:           :       1019
+Cosmic:          :        982
+hfor:            :        982
+Htautau veto     :          0
+atleast 2        :         74
+exactly 2        :         74
+mll              :         67
+nSigLep          :          0
+   ------  Start Comparison Here ------ 
+Dilepton type    :         ee        mm        em        me     em+me
+category         :          0         0         0         0         0
+nSigLep          :          0         0         0         0         0
+tauVeto          :          0         0         0         0         0
+trig:            :          0         0         0         0         0
+trig match:      :          0         0         0         0         0
+mc prompt2l      :          0         0         0         0         0
+SS:              :          0         0         0         0         0
+muIso            :          0         0         0         0         0
+elD0Sig          :          0         0         0         0         0
+fjVeto           :          0         0         0         0         0
+bjVeto           :          0         0         0         0         0
+ge1j             :          0         0         0         0         0
+lepPt            :          0         0         0         0         0
+mllZveto         :          0         0         0         0         0
+mWwt             :          0         0         0         0         0
+ht               :          0         0         0         0         0
+metRel           :          0         0         0         0         0
+----------------------------------------
+mllMin           :          0         0         0         0         0
+flavor:          :          0         0         0         0         0
+OS:              :          0         0         0         0         0
+----------------------------------------
+****************************************
+Event counts for weight: Pileup
+----------------------------------------
+input:           :       1024
+GRL              :       1024
+LarErr           :       1024
+TileErr          :       1024
+TTCVeto          :       1024
+GoodVtx          :       1024
+TileTripCut      :       1024
+LAr:             :       1024
+BadJet:          :       1019
+FEB:             :       1019
+BadMu:           :       1019
+Cosmic:          :        982
+hfor:            :        982
+Htautau veto     :          0
+atleast 2        :         74
+exactly 2        :         74
+mll              :         67
+nSigLep          :          0
+   ------  Start Comparison Here ------ 
+Dilepton type    :         ee        mm        em        me     em+me
+category         :          0         0         0         0         0
+nSigLep          :          0         0         0         0         0
+tauVeto          :          0         0         0         0         0
+trig:            :          0         0         0         0         0
+trig match:      :          0         0         0         0         0
+mc prompt2l      :          0         0         0         0         0
+SS:              :          0         0         0         0         0
+muIso            :          0         0         0         0         0
+elD0Sig          :          0         0         0         0         0
+fjVeto           :          0         0         0         0         0
+bjVeto           :          0         0         0         0         0
+ge1j             :          0         0         0         0         0
+lepPt            :          0         0         0         0         0
+mllZveto         :          0         0         0         0         0
+mWwt             :          0         0         0         0         0
+ht               :          0         0         0         0         0
+metRel           :          0         0         0         0         0
+----------------------------------------
+mllMin           :          0         0         0         0         0
+flavor:          :          0         0         0         0         0
+OS:              :          0         0         0         0         0
+----------------------------------------
+****************************************
+Event counts for weight: LeptonSF
+----------------------------------------
+input:           :       1024
+GRL              :       1024
+LarErr           :       1024
+TileErr          :       1024
+TTCVeto          :       1024
+GoodVtx          :       1024
+TileTripCut      :       1024
+LAr:             :       1024
+BadJet:          :       1019
+FEB:             :       1019
+BadMu:           :       1019
+Cosmic:          :        982
+hfor:            :        982
+Htautau veto     :          0
+atleast 2        :         74
+exactly 2        :         74
+mll              :         67
+nSigLep          :          0
+   ------  Start Comparison Here ------ 
+Dilepton type    :         ee        mm        em        me     em+me
+category         :          0         0         0         0         0
+nSigLep          :          0         0         0         0         0
+tauVeto          :          0         0         0         0         0
+trig:            :          0         0         0         0         0
+trig match:      :          0         0         0         0         0
+mc prompt2l      :          0         0         0         0         0
+SS:              :          0         0         0         0         0
+muIso            :          0         0         0         0         0
+elD0Sig          :          0         0         0         0         0
+fjVeto           :          0         0         0         0         0
+bjVeto           :          0         0         0         0         0
+ge1j             :          0         0         0         0         0
+lepPt            :          0         0         0         0         0
+mllZveto         :          0         0         0         0         0
+mWwt             :          0         0         0         0         0
+ht               :          0         0         0         0         0
+metRel           :          0         0         0         0         0
+----------------------------------------
+mllMin           :          0         0         0         0         0
+flavor:          :          0         0         0         0         0
+OS:              :          0         0         0         0         0
+----------------------------------------
+****************************************
+Event counts for weight: btagSF
+----------------------------------------
+input:           :       1024
+GRL              :       1024
+LarErr           :       1024
+TileErr          :       1024
+TTCVeto          :       1024
+GoodVtx          :       1024
+TileTripCut      :       1024
+LAr:             :       1024
+BadJet:          :       1019
+FEB:             :       1019
+BadMu:           :       1019
+Cosmic:          :        982
+hfor:            :        982
+Htautau veto     :          0
+atleast 2        :         74
+exactly 2        :         74
+mll              :         67
+nSigLep          :          0
+   ------  Start Comparison Here ------ 
+Dilepton type    :         ee        mm        em        me     em+me
+category         :          0         0         0         0         0
+nSigLep          :          0         0         0         0         0
+tauVeto          :          0         0         0         0         0
+trig:            :          0         0         0         0         0
+trig match:      :          0         0         0         0         0
+mc prompt2l      :          0         0         0         0         0
+SS:              :          0         0         0         0         0
+muIso            :          0         0         0         0         0
+elD0Sig          :          0         0         0         0         0
+fjVeto           :          0         0         0         0         0
+bjVeto           :          0         0         0         0         0
+ge1j             :          0         0         0         0         0
+lepPt            :          0         0         0         0         0
+mllZveto         :          0         0         0         0         0
+mWwt             :          0         0         0         0         0
+ht               :          0         0         0         0         0
+metRel           :          0         0         0         0         0
+----------------------------------------
+mllMin           :          0         0         0         0         0
+flavor:          :          0         0         0         0         0
+OS:              :          0         0         0         0         0
+----------------------------------------
+****************************************
+Event counts for weight: TrigSF
+----------------------------------------
+input:           :       1024
+GRL              :       1024
+LarErr           :       1024
+TileErr          :       1024
+TTCVeto          :       1024
+GoodVtx          :       1024
+TileTripCut      :       1024
+LAr:             :       1024
+BadJet:          :       1019
+FEB:             :       1019
+BadMu:           :       1019
+Cosmic:          :        982
+hfor:            :        982
+Htautau veto     :          0
+atleast 2        :         74
+exactly 2        :         74
+mll              :         67
+nSigLep          :          0
+   ------  Start Comparison Here ------ 
+Dilepton type    :         ee        mm        em        me     em+me
+category         :          0         0         0         0         0
+nSigLep          :          0         0         0         0         0
+tauVeto          :          0         0         0         0         0
+trig:            :          0         0         0         0         0
+trig match:      :          0         0         0         0         0
+mc prompt2l      :          0         0         0         0         0
+SS:              :          0         0         0         0         0
+muIso            :          0         0         0         0         0
+elD0Sig          :          0         0         0         0         0
+fjVeto           :          0         0         0         0         0
+bjVeto           :          0         0         0         0         0
+ge1j             :          0         0         0         0         0
+lepPt            :          0         0         0         0         0
+mllZveto         :          0         0         0         0         0
+mWwt             :          0         0         0         0         0
+ht               :          0         0         0         0         0
+metRel           :          0         0         0         0         0
+----------------------------------------
+mllMin           :          0         0         0         0         0
+flavor:          :          0         0         0         0         0
+OS:              :          0         0         0         0         0
+----------------------------------------
+****************************************
+Event counts for weight: All
+----------------------------------------
+input:           :       1024
+GRL              :       1024
+LarErr           :       1024
+TileErr          :       1024
+TTCVeto          :       1024
+GoodVtx          :       1024
+TileTripCut      :       1024
+LAr:             :       1024
+BadJet:          :       1019
+FEB:             :       1019
+BadMu:           :       1019
+Cosmic:          :        982
+hfor:            :        982
+Htautau veto     :          0
+atleast 2        :         74
+exactly 2        :         74
+mll              :         67
+nSigLep          :          0
+   ------  Start Comparison Here ------ 
+Dilepton type    :         ee        mm        em        me     em+me
+category         :          0         0         0         0         0
+nSigLep          :          0         0         0         0         0
+tauVeto          :          0         0         0         0         0
+trig:            :          0         0         0         0         0
+trig match:      :          0         0         0         0         0
+mc prompt2l      :          0         0         0         0         0
+SS:              :          0         0         0         0         0
+muIso            :          0         0         0         0         0
+elD0Sig          :          0         0         0         0         0
+fjVeto           :          0         0         0         0         0
+bjVeto           :          0         0         0         0         0
+ge1j             :          0         0         0         0         0
+lepPt            :          0         0         0         0         0
+mllZveto         :          0         0         0         0         0
+mWwt             :          0         0         0         0         0
+ht               :          0         0         0         0         0
+metRel           :          0         0         0         0         0
+----------------------------------------
+mllMin           :          0         0         0         0         0
+flavor:          :          0         0         0         0         0
+OS:              :          0         0         0         0         0
+----------------------------------------
+
+SusySelection job done
