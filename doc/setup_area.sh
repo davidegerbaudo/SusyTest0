@@ -30,6 +30,12 @@ svn co ${SVN_INST}/UCIrvine/mrelich/SusyXSReader/trunk                        Su
 git clone git@github.com:gerbaudo/SusyMatrixMethod.git
 git clone git@github.com:gerbaudo/SusyTest0.git
 
+
+cd SusyTest0
+git fetch
+git checkout -b clenaup-deps-avital origin/clenaup-deps-avital
+cd ..
+
 cd SusyNtuple; patch <   ../SusyTest0/doc/SusyNtuple.patch2013-09-11 ; cd -
 echo "check whether the patch was applied correctly..."
 echo "you should switch to the trunk"
