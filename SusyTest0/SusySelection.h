@@ -168,6 +168,8 @@ class SusySelection : public SusyNtAna
     Met                 m_unsmeared_met; //! cached met before charge-flip smearing
     WeightComponents    m_weightComponents;
     susy::ProgressPrinter m_printer;
+    size_t              m_printWeightsCounter;
+
     // Event counters
     float n_readin          [kWeightTypesN]; // [weight type]
     float n_pass_Grl        [kWeightTypesN];

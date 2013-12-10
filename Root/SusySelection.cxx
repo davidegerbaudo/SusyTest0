@@ -38,7 +38,8 @@ SusySelection::SusySelection() :
   m_w(1.0),
   m_useXsReader(false),
   m_xsFromReader(-1.0),
-  m_qflipProb(0.0)
+  m_qflipProb(0.0),
+  m_printWeightsCounter(0)
 {
   resetAllCounters();
   setAnaType(Ana_2LepWH);
@@ -81,16 +82,29 @@ Bool_t SusySelection::Process(Long64_t entry)
   const JetVector&   bj = m_baseJets;
   const LeptonVector& l = m_signalLeptons;
   if(l.size()>1) computeNonStaticWeightComponents(l, bj); else return false;
-  if(passSrSs(WH_SRSS1,
-              m_signalLeptons, m_signalTaus, m_signalJets2Lep, m_met, allowQflip).metrel) {
+  SsPassFlags flags(passSrSs(WH_SRSS1, m_signalLeptons, m_signalTaus, m_signalJets2Lep, m_met, allowQflip));
+  if(flags.metrel) {
+      unsigned int run(nt.evt()->run), event(nt.evt()->event);
       if(m_writeTuple) {
           double weight(m_weightComponents.product());
-          unsigned int run(nt.evt()->run), event(nt.evt()->event);
           LeptonVector anyLep(getAnyElOrMu(nt));
           LeptonVector lowPtLep(subtract_vector(anyLep, m_baseLeptons));
           const Lepton *l0 = m_signalLeptons[0];
           const Lepton *l1 = m_signalLeptons[1];
           m_tupleMaker.fill(weight, run, event, *l0, *l1, *m_met, lowPtLep, m_signalJets2Lep);
+      }
+      susy::wh::Chan ch(getChan(m_signalLeptons));
+      string ll(ch==susy::wh::Ch_ee ? "ee" :
+                ch==susy::wh::Ch_mm ? "mm" :
+                ch==susy::wh::Ch_em ? "em" :
+                "??");
+      if(m_printWeightsCounter < 10) {
+          cout<<"   run "<<run
+              <<" : event "<<event
+              <<" : ll "<<ll
+              <<" : weights "<<m_weightComponents.str()
+              <<endl;
+          m_printWeightsCounter++;
       }
   }
   return kTRUE;
