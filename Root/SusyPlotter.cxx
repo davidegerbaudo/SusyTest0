@@ -116,10 +116,10 @@ Bool_t SusyPlotter::Process(Long64_t entry)
   const TauVector&    t = m_signalTaus;
   if(l.size()>1) computeNonStaticWeightComponents(l, bj); else return false;
   float weight(m_weightComponents.product());
-  if(susy::pass2LepPt(l, 30.0, 20.0)
-     && passTrig2L     (l)
-     && passTrig2LMatch(l))
-      fillHistos(ncl, j, m, weight, PR_CR8lpt, sys);
+  bool pass2l(susy::pass2LepPt(l, 30.0, 20.0));
+  bool passTrig(passTrig2L(l) && passTrig2LMatch(l));
+  if(pass2l)             fillHistos(ncl, j, m, weight, PR_CR8lpt, sys);
+  if(pass2l && passTrig) fillHistos(ncl, j, m, weight, PR_SR8,    sys);
   return kTRUE;
 }
 //-----------------------------------------
