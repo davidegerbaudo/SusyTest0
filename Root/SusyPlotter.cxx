@@ -116,31 +116,10 @@ Bool_t SusyPlotter::Process(Long64_t entry)
   const TauVector&    t = m_signalTaus;
   if(l.size()>1) computeNonStaticWeightComponents(l, bj); else return false;
   float weight(m_weightComponents.product());
-  if(susy::pass2LepPt(l, 30.0, 20.0))
+  if(susy::pass2LepPt(l, 30.0, 20.0)
+     && passTrig2L     (l)
+     && passTrig2LMatch(l))
       fillHistos(ncl, j, m, weight, PR_CR8lpt, sys);
-
-
-  bool allowQflip(true);
-  SsPassFlags ssf(SusySelection::passSrSs(WH_SRSS1, ncl, t, j, m, allowQflip));
-  if(!ssf.passLpt()) return false;
-  const DiLepEvtType ll(getDiLepEvtType(l)), ee(ET_ee), mm(ET_mm);
-
-  bool sameFlav(ll==ee||ll==mm);
-  if(ssf.passLpt()) {
-    PlotRegion pr = (sameFlav ? PR_CR8lpt : PR_CR9lpt);
-    fillHistos(ncl, j, m, weight, pr, sys);
-    if     (ll==ee && ssf.zllVeto) fillHistos(ncl, j, m, weight, PR_CR8ee, sys);
-    else if(ll==mm) {
-      bool passMinMet(m->Et > 40.0);
-      if(passMinMet ) fillHistos(ncl, j, m, weight, PR_CR8mm,     sys);
-      if(ssf.mtllmet) fillHistos(ncl, j, m, weight, PR_CR8mmMtww, sys);
-      if(ssf.ht     ) fillHistos(ncl, j, m, weight, PR_CR8mmHt,   sys);
-    } // end if(mm)
-  } // end passLpt
-  if(ssf.passAll()) {
-    PlotRegion pr = (sameFlav ? PR_SR8    : PR_SR9);
-    fillHistos(ncl, j, m, weight, pr, sys);
-  }
   return kTRUE;
 }
 //-----------------------------------------
