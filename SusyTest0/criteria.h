@@ -35,6 +35,7 @@ namespace susy
   bool passMllMin(const LeptonVector& l, float minVal);
   bool passDrllMax(const LeptonVector& l, float maxDr);
   bool passdPhi(TLorentzVector v0, TLorentzVector v1, float cut);
+  float mtLlMetMin(const LeptonVector& l, const Susy::Met* met);
   bool passMtLlMetMin(const LeptonVector& leptons, const Susy::Met* met, float minVal=50.0);
   bool passMtMinlmetMin(const LeptonVector& leptons, const Susy::Met* met, float minVal=50.0);
   float computeMt2(const TLorentzVector &l0, const TLorentzVector &l1, const TLorentzVector &met);

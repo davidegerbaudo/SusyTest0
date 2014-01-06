@@ -151,6 +151,13 @@ bool passdPhi(TLorentzVector v0, TLorentzVector v1, float cut)
   return v0.DeltaPhi(v1) > cut;
 }
 //-----------------------------------------
+float mtLlMetMin(const LeptonVector& l, const Susy::Met* met)
+{
+  if(l.size() < 2 || !l[0] || !l[1]) return 0.0;
+  TLorentzVector ll = (*l[0] + *l[1]);
+  return transverseMass(ll, met->lv());
+}
+//-----------------------------------------
 bool passMtLlMetMin(const LeptonVector& l, const Susy::Met* met, float minVal)
 {
   if(l.size() < 2 || !l[0] || !l[1]) return false;
