@@ -208,6 +208,17 @@ bool SusySelection::passSrSsBase()
 {
   return false;
 }
+bool isEventToBePrinted(int run, int event)
+{
+    int run_(195847);
+    int events_[] = {9763, 969966, 1123186, 2142651, 983107, 1121301, 265276, 1860096, 1025528, 1026993, 1524497, 1991029, 1290354,
+                     183225, 1436000};
+    size_t nEvents_ = sizeof(events_)/sizeof(events_[0]);
+    const int* begin = events_;
+    const int* end   = events_ + nEvents_;
+    const int* it    = std::find(begin, end, event);
+    return run==run_ && it!=end;
+}
 //-----------------------------------------
 SsPassFlags SusySelection::passSrSs(const WH_SR signalRegion,
                                     LeptonVector& leptons,
@@ -258,11 +269,17 @@ SsPassFlags SusySelection::passSrSs(const WH_SR signalRegion,
   if(passTrig2L     (ls))                       { increment(n_pass_tr2L     [ll], wc); f.trig2l     =true;} else return f;
   if(passTrig2LMatch(ls))                       { increment(n_pass_tr2LMatch[ll], wc); f.trig2lmatch=true;} else return f;
   if(data || susy::isTrueDilepton(ls))          { increment(n_pass_mcTrue2l [ll], wc); f.true2l     =true;} else return f;
+  unsigned int run(nt.evt()->run), event(nt.evt()->event);
+  bool toBePrinted(isEventToBePrinted(run, event));
+  if(toBePrinted)
+      cout<<"run "<<run<<" event "<<event<<endl
+          <<"before qflip : met et "<<ncmet.Et<<" phi "<<ncmet.phi<<" mtww "<<susy::mtLlMetMin(ncls, met)<<endl;
   bool sameSign = allowQflip ? sameSignOrQflip(ncls, ncmet, ll, u4m, mc) : susy::sameSign(ncls);
   if(sameSign)                                  { increment(n_pass_ss       [ll], wc); f.sameSign   =true;} else return f;
   met = &ncmet; // after qflip, use potentially smeared lep and met
                                                   increment(n_pass_muIso    [ll], wc);
                                                   increment(n_pass_elD0Sig  [ll], wc);
+  if(toBePrinted) cout<<"after qflip : met et "<<ncmet.Et<<" phi "<<ncmet.phi<<" mtww "<<susy::mtLlMetMin(ncls, met)<<endl;
   if(passfJetVeto  (js))                        { increment(n_pass_fjVeto   [ll], wc); f.fjveto     =true;} else return f;
   if(passbJetVeto  (js))                        { increment(n_pass_bjVeto   [ll], wc); f.bjveto     =true;} else return f;
   if(passge1Jet    (js))                        { increment(n_pass_ge1j     [ll], wc); f.ge1j       =true;} else return f;
