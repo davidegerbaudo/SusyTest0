@@ -1,0 +1,4 @@
+SusySel \
+ -i filelist/Sherpa_CT10_lllnu_WZ.txt \
+ -s Sherpa_CT10_lllnu_WZ  \
+ >& /tmp/gerbaudo/Sherpa_CT10_lllnu_WZ.log
