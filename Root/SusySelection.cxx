@@ -83,7 +83,7 @@ Bool_t SusySelection::Process(Long64_t entry)
   const LeptonVector& l = m_signalLeptons;
   if(l.size()>1) computeNonStaticWeightComponents(l, bj); else return false;
   SsPassFlags flags(passSrSs(WH_SRSS1, m_signalLeptons, m_signalTaus, m_signalJets2Lep, m_met, allowQflip));
-  if(flags.metrel) {
+  if(flags.ht) {
       unsigned int run(nt.evt()->run), event(nt.evt()->event);
       if(m_writeTuple) {
           double weight(m_weightComponents.product());
@@ -98,14 +98,12 @@ Bool_t SusySelection::Process(Long64_t entry)
                 ch==susy::wh::Ch_mm ? "mm" :
                 ch==susy::wh::Ch_em ? "em" :
                 "??");
-      if(m_printWeightsCounter < 10) {
-          cout<<"   run "<<run
-              <<" : event "<<event
-              <<" : ll "<<ll
-              <<" : weights "<<m_weightComponents.str()
-              <<endl;
-          m_printWeightsCounter++;
-      }
+      cout<<"   run "<<run
+          <<" : event "<<event
+          <<" : ll "<<ll
+          <<" : weights "<<m_weightComponents.str()
+          <<endl;
+      m_printWeightsCounter++;
   }
   return kTRUE;
 }
@@ -211,8 +209,7 @@ bool SusySelection::passSrSsBase()
 bool isEventToBePrinted(int run, int event)
 {
     int run_(195847);
-    int events_[] = {9763, 969966, 1123186, 2142651, 983107, 1121301, 265276, 1860096, 1025528, 1026993, 1524497, 1991029, 1290354,
-                     183225, 1436000};
+    int events_[] = { 1357429, 2052596, 1053625, 1294758, 2074372, 164237 };
     size_t nEvents_ = sizeof(events_)/sizeof(events_[0]);
     const int* begin = events_;
     const int* end   = events_ + nEvents_;
@@ -271,15 +268,19 @@ SsPassFlags SusySelection::passSrSs(const WH_SR signalRegion,
   if(data || susy::isTrueDilepton(ls))          { increment(n_pass_mcTrue2l [ll], wc); f.true2l     =true;} else return f;
   unsigned int run(nt.evt()->run), event(nt.evt()->event);
   bool toBePrinted(isEventToBePrinted(run, event));
-  if(toBePrinted)
+  if(toBePrinted) {
       cout<<"run "<<run<<" event "<<event<<endl
-          <<"before qflip : met et "<<ncmet.Et<<" phi "<<ncmet.phi<<" mtww "<<susy::mtLlMetMin(ncls, met)<<endl;
+          <<"before qflip : met et "<<ncmet.Et<<" phi "<<ncmet.phi
+          <<" mtww "<<susy::mtLlMetMin(ncls, met)<<" ht "<<susy::computeHt(ncls, js, met)<<endl;
+  }
   bool sameSign = allowQflip ? sameSignOrQflip(ncls, ncmet, ll, u4m, mc) : susy::sameSign(ncls);
   if(sameSign)                                  { increment(n_pass_ss       [ll], wc); f.sameSign   =true;} else return f;
   met = &ncmet; // after qflip, use potentially smeared lep and met
                                                   increment(n_pass_muIso    [ll], wc);
                                                   increment(n_pass_elD0Sig  [ll], wc);
-  if(toBePrinted) cout<<"after qflip : met et "<<ncmet.Et<<" phi "<<ncmet.phi<<" mtww "<<susy::mtLlMetMin(ncls, met)<<endl;
+  if(toBePrinted)
+      cout<<"after qflip : met et "<<ncmet.Et<<" phi "<<ncmet.phi
+          <<" mtww "<<susy::mtLlMetMin(ncls, met)<<" ht "<<susy::computeHt(ncls, js, met)<<endl;
   if(passfJetVeto  (js))                        { increment(n_pass_fjVeto   [ll], wc); f.fjveto     =true;} else return f;
   if(passbJetVeto  (js))                        { increment(n_pass_bjVeto   [ll], wc); f.bjveto     =true;} else return f;
   if(passge1Jet    (js))                        { increment(n_pass_ge1j     [ll], wc); f.ge1j       =true;} else return f;
