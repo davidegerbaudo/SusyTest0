@@ -40,6 +40,8 @@ namespace susy
   bool passMtMinlmetMin(const LeptonVector& leptons, const Susy::Met* met, float minVal=50.0);
   float computeMt2(const TLorentzVector &l0, const TLorentzVector &l1, const TLorentzVector &met);
   bool passMT2(const LeptonVector& leptons, const Susy::Met* met, float cut);
+  //! static copy of SusyNtTools::Meff, which uses all leptons, all jets, and met; is this what we want?
+  float computeHt(const LeptonVector& leptons, const JetVector &jets, const Susy::Met* met);
   bool passHtMin(const LeptonVector& l, const JetVector &j, const Susy::Met* met, float minVal);
   bool passNlepMin(const LeptonVector &leptons, size_t minVal);
   bool passZtautauVeto(const LeptonVector& l, const JetVector& j, const Susy::Met* m, float widthZpeak=40.0);

@@ -196,18 +196,24 @@ bool passMT2(const LeptonVector& leptons, const Susy::Met* met, float cut)
   return (computeMt2(l0, l1, metlv) > cut);
 }
 //----------------------------------------------------------
-bool passHtMin(const LeptonVector& leptons,
-               const JetVector &jets,
-               const Susy::Met* met,
-               float minVal)
-{ // DG : static copy of SusyNtTools::Meff, which uses all leptons, all jets, and met; is this what we want?
+float computeHt(const LeptonVector& leptons,
+                const JetVector &jets,
+                const Susy::Met* met)
+{
   float meff = 0;
   for(uint i=0; i<leptons.size(); i++) meff += leptons[i]->Pt();
   for(uint i=0; i<jets.size(); i++){
     if(jets[i]->Pt() > 20.0) meff += jets[i]->Pt();
   }
   meff += met->Et;
-  return (minVal < meff);
+  return meff;
+}
+bool passHtMin(const LeptonVector& leptons,
+               const JetVector &jets,
+               const Susy::Met* met,
+               float minVal)
+{
+    return minVal < computeHt(leptons, jets, met);
 }
 //----------------------------------------------------------
 bool passNlepMin(const LeptonVector &leptons, size_t minVal)
