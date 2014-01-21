@@ -100,6 +100,9 @@ def selectionRegions() :
             'CR_CR8mmHt',
             'CR_SsEwk',
             'CR_SsEwkLoose',
+            'qcdMC',
+            'convMC',
+            'realMC'
             ]
 def getInputFiles(inputDirname, tag, verbose=False) :
     inDir = inputDirname
@@ -269,7 +272,7 @@ def plotFractions(fractDict={}, countDict={}, outplotdir='./', prefix='') :
     input : fractDict[sr][lep_type][sample] = float
     """
     outplotdir = outplotdir if outplotdir.endswith('/') else outplotdir+'/'
-    def isInterestingRegion(r) : return any(k in r for k in ['CR8', 'WHSS', 'SSInc', 'SsEwk',])
+    def isInterestingRegion(r) : return any(k in r for k in ['CR8', 'WHSS', 'SSInc', 'SsEwk', 'convMC', 'qcdMC', 'realMC'])
     regions  = [r for r in selectionRegions() if isInterestingRegion(r)]
     leptypes = sorted(first(fractDict).keys())
     samples  = sorted(first(first(fractDict)).keys())
