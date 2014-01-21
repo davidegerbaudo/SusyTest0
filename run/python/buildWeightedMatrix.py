@@ -282,24 +282,20 @@ def plotFractions(fractDict={}, countDict={}, outplotdir='./', prefix='') :
     for lt in leptypes :
         fracPerSample = dict((s, np.array([fractDict[r][lt][s] for r in regions])) for s in samples)
         cntPerSample  = dict((s,          [countDict[r][lt][s] for r in regions])  for s in samples)
+        cntPerRegion = dict((r, sum([countDict[r][lt][s] for s in samples])) for r in regions)
         below = np.zeros(len(regions))
         plots = []
         fig, ax = plt.subplots()
-        for s in fracPerSample.keys() :
-            frac, cnt = fracPerSample[s], cntPerSample[s]
+        for s, frac in fracPerSample.iteritems() :
             rects = plt.bar(ind, frac, width, color=colors[s], bottom=below)
-            lbls = ["%d: %s %d"%(i,colors[s], cntPerSample[s][i]) for i in range(len(rects))]
-            def autolabel(rects, lbls):
-                'add a label at the center of the rectangle'
-                for rect, lbl in zip(rects, lbls) :
-                    middleY = rect.get_y() + 0.5*rect.get_height()
-                    ax.text(rect.get_x()+rect.get_width()/2., middleY, lbl, ha='center', va='bottom')
-            autolabel(rects, lbls)
             plots.append(rects)
             below = below + frac
+        binCenters = ind+width/2.
         plt.ylabel('fractions')
         plt.title(prefix+' '+lt+' compositions')
-        plt.xticks(ind+width/2., regions)
+        plt.xticks(binCenters, regions)
+        for i,r in enumerate(regions) :
+            ax.text(binCenters[i], 0.5, "%.1f"%cntPerRegion[r], ha='center', va='center', rotation='vertical')
         plt.ylim((0.0, 1.0))
         plt.grid(True)
         plt.yticks(np.arange(0.0, 1.0, 0.2))
