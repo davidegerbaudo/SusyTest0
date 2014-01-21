@@ -184,7 +184,7 @@ def buildMuonRates(inputFiles, outputfile, outplotdir, verbose=False) :
     """
     processes = fakeProcesses()
     brsit, iF = buildRatioAndScaleIt, inputFiles
-    mu_qcdSF, mu_realSF = 0.76, 0.99635
+    mu_qcdSF, mu_realSF = 0.86, 0.99589
     print "buildMuonRates: values to be fixed: ",' '.join(["%s: %s"%(v, eval(v)) for v in ['mu_qcdSF', 'mu_realSF']])
     eff_qcd  = dict((p, brsit('muon_qcdMC_all_l_pt_coarse',  iF[p], mu_qcdSF))  for p in processes)
     eff_real = dict((p, brsit('muon_realMC_all_l_pt_coarse', iF[p], mu_realSF)) for p in processes)
@@ -210,7 +210,7 @@ def buildElectronRates(inputFiles, outputfile, outplotdir, verbose=False) :
     """
     processes = fakeProcesses()
     brsit, iF = buildRatioAndScaleIt, inputFiles
-    el_convSF, el_qcdSF, el_realSF = 1.04, 0.58, 0.99616
+    el_convSF, el_qcdSF, el_realSF = 1.09, 0.63, 0.99640
     print "buildElectronRates: values to be fixed: ",' '.join(["%s: %s"%(v, eval(v)) for v in ['el_qcdSF', 'el_convSF', 'el_realSF']])
     eff_conv = dict((p, brsit('elec_convMC_all_l_pt_coarse', iF[p], el_convSF)) for p in processes)
     eff_qcd  = dict((p, brsit('elec_qcdMC_all_l_pt_coarse',  iF[p], el_qcdSF))  for p in processes)
