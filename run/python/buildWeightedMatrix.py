@@ -198,7 +198,7 @@ def buildMuonRates(inputFiles, outputfile, outplotdir, verbose=False) :
         mu_count[sr] = {'qcd' : cnts_qcd, 'real' : cnts_real}
         mu_frac [sr] = {'qcd' : frac_qcd, 'real' : frac_real}
     #json_write(mu_frac, outplotdir+/outFracFilename)
-    plotFractions(mu_frac, outplotdir, 'mu')
+    plotFractions(mu_frac, mu_count, outplotdir, 'mu')
 def buildElectronRates(inputFiles, outputfile, outplotdir, verbose=False) :
     """
     For each selection region, build the real eff and fake rate
@@ -230,7 +230,7 @@ def buildElectronRates(inputFiles, outputfile, outplotdir, verbose=False) :
         el_count[sr] = {'conv' : cnts_conv, 'qcd' : cnts_qcd, 'real' : cnts_real}
         el_frac [sr] = {'conv' : frac_conv, 'qcd' : frac_qcd, 'real' : frac_real}
     #json_write(el_frac, outFracFilename)
-    plotFractions(el_frac, outplotdir, 'el')
+    plotFractions(el_frac, el_count, outplotdir, 'el')
 def buildEtaSyst(inputFileTotMc, inputHistoBaseName='(elec|muon)_qcdMC_all', outputHistoName='') :
     """
     Take the eta distribution and normalize it to the average fake
@@ -278,11 +278,21 @@ def plotFractions(fractDict={}, outplotdir='./', prefix='') :
     colors = dict(zip(samples, ['b','g','r','c','m','y']))
     for lt in leptypes :
         fracPerSample = dict((s, np.array([fractDict[r][lt][s] for r in regions])) for s in samples)
+        cntPerSample  = dict((s,          [countDict[r][lt][s] for r in regions])  for s in samples)
         below = np.zeros(len(regions))
         plots = []
         fig, ax = plt.subplots()
-        for s, frac in fracPerSample.iteritems() :
-            plots.append(plt.bar(ind, frac, width, color=colors[s], bottom=below))
+        for s in fracPerSample.keys() :
+            frac, cnt = fracPerSample[s], cntPerSample[s]
+            rects = plt.bar(ind, frac, width, color=colors[s], bottom=below)
+            lbls = ["%d: %s %d"%(i,colors[s], cntPerSample[s][i]) for i in range(len(rects))]
+            def autolabel(rects, lbls):
+                'add a label at the center of the rectangle'
+                for rect, lbl in zip(rects, lbls) :
+                    middleY = rect.get_y() + 0.5*rect.get_height()
+                    ax.text(rect.get_x()+rect.get_width()/2., middleY, lbl, ha='center', va='bottom')
+            autolabel(rects, lbls)
+            plots.append(rects)
             below = below + frac
         plt.ylabel('fractions')
         plt.title(prefix+' '+lt+' compositions')
