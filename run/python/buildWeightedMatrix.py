@@ -119,34 +119,28 @@ def buildRatioAndScaleIt(histoPrefix='', inputFile=None, scaleFactor=1.0) :
     ratioHisto = buildRatio(inputFile, histoPrefix)
     ratioHisto.Scale(scaleFactor)
     return ratioHisto
-def buildPercentages(inputFiles, histoName, binLabel) :
-    "build a dictionary (process, fraction of counts) for a given bin"
+def getCounts(inputFiles={}, histoName='', binLabel='') :
+    "from a dict of input files, return a similar dict with the counts from a bin of a given histo"
     histos = dict((p, f.Get(histoName)) for p, f in inputFiles.iteritems())
     assert all(h for h in histos.values()),"missing histo '%s'\n%s"%(histoName, '\n'.join("%s : %s"%(k, str(v)) for k, v in histos.iteritems()))
     bin = first(histos).GetXaxis().FindBin(binLabel)
     counts = dict((p, h.GetBinContent(bin)) for p, h in histos.iteritems())
-    norm = sum(counts.values())
-    if not norm : print "buildPercentages: warning, all empty histograms for %s[%s]"%(histoName, binLabel)
-    counts = dict((p, c/norm if norm else 0.0)for p,c in counts.iteritems())
+    if not any(c for c in counts.items()) : print "getCounts: warning, all empty histograms for %s[%s]"%(histoName, binLabel)
     return counts
-def buildPercentagesTwice(inputFiles, histoName, binLabelA, binLabelB) :
+def buildPercentages(counts={}) :
+    "Build a dictionary (process, fraction of counts) for a given bin"
+    norm = sum(counts.values())
+    return dict((p, c/norm if norm else 0.0)for p,c in counts.iteritems())
+def buildPercentagesTwice(countsQcd, countsConv) :
     """
-    build two dictionaries (process, fraction of counts) for two given bins.
-    Note that we cannot use buildPercentages because we want to
-    normalize A and B (i.e. qcd and conv) together.
-    Maybe refactor these two buildPercentages* functions?
+    Build two dictionaries (process, fraction of counts) for two dicts
+    of counters.  Fractions are normalized to the sum of the two
+    counters, i.e. we want to normalize qcd and conv together.
     """
-    histos = dict((p, f.Get(histoName)) for p, f in inputFiles.iteritems())
-    assert all(h for h in histos.values()),"missing histo '%s'\n%s"%(histoName, '\n'.join("%s : %s"%(k, str(v)) for k, v in histos.iteritems()))
-    binA = first(histos).GetXaxis().FindBin(binLabelA)
-    binB = first(histos).GetXaxis().FindBin(binLabelB)
-    countsA = dict((p, h.GetBinContent(binA)) for p, h in histos.iteritems())
-    countsB = dict((p, h.GetBinContent(binB)) for p, h in histos.iteritems())
-    norm = sum(countsA.values() + countsB.values())
-    if not norm : print "buildPercentages: warning, all empty histograms for %s[%s,%s]"%(histoName, binLabelA, binLabelB)
-    countsA = dict((p, c/norm if norm else 0.0)for p,c in countsA.iteritems())
-    countsB = dict((p, c/norm if norm else 0.0)for p,c in countsB.iteritems())
-    return countsA, countsB
+    norm = sum(countsQcd.values() + countsConv.values())
+    fracsQcd  = dict((p, c/norm if norm else 0.0)for p,c in countsQcd.iteritems())
+    fracsConv = dict((p, c/norm if norm else 0.0)for p,c in countsConv.iteritems())
+    return fracsQcd, fracsConv
 def binWeightedSum(histos={}, weights={}, bin=1) :
     assert not set(histos)-set(weights), "different keys: histos[%s], weights[%s]"%(str(histos.keys()), str(weights.keys()))
     cews = [(h.GetBinContent(bin), h.GetBinError(bin), w)
@@ -188,10 +182,12 @@ def buildMuonRates(inputFiles, outputfile, outplotdir, verbose=False) :
     print "buildMuonRates: values to be fixed: ",' '.join(["%s: %s"%(v, eval(v)) for v in ['mu_qcdSF', 'mu_realSF']])
     eff_qcd  = dict((p, brsit('muon_qcdMC_all_l_pt_coarse',  iF[p], mu_qcdSF))  for p in processes)
     eff_real = dict((p, brsit('muon_realMC_all_l_pt_coarse', iF[p], mu_realSF)) for p in processes)
-    mu_frac = dict()
+    mu_frac, mu_count = dict(), dict()
     for sr in selectionRegions() :
-        frac_qcd  = buildPercentages(inputFiles, 'muon_'+sr+'_all_flavor_den', 'qcd')
-        frac_real = buildPercentages(inputFiles, 'muon_'+sr+'_all_flavor_den', 'real')
+        cnts_qcd  = getCounts(inputFiles, 'muon_'+sr+'_all_flavor_den', 'qcd')
+        cnts_real = getCounts(inputFiles, 'muon_'+sr+'_all_flavor_den', 'real')
+        frac_qcd  = buildPercentages(cnts_qcd)
+        frac_real = buildPercentages(cnts_real)
         if verbose : print "mu : sr ",sr,"\n frac_qcd  : ",frac2str(frac_qcd )
         if verbose : print "mu : sr ",sr,"\n frac_real : ",frac2str(frac_real)
         fake = buildWeightedHisto(eff_qcd,  frac_qcd, 'mu_fake_rate_'+sr, 'Muon fake rate '+sr)
@@ -199,7 +195,8 @@ def buildMuonRates(inputFiles, outputfile, outplotdir, verbose=False) :
         outputfile.cd()
         fake.Write()
         real.Write()
-        mu_frac[sr] = {'qcd' : frac_qcd, 'real' : frac_real}
+        mu_count[sr] = {'qcd' : cnts_qcd, 'real' : cnts_real}
+        mu_frac [sr] = {'qcd' : frac_qcd, 'real' : frac_real}
     #json_write(mu_frac, outplotdir+/outFracFilename)
     plotFractions(mu_frac, outplotdir, 'mu')
 def buildElectronRates(inputFiles, outputfile, outplotdir, verbose=False) :
@@ -215,11 +212,13 @@ def buildElectronRates(inputFiles, outputfile, outplotdir, verbose=False) :
     eff_conv = dict((p, brsit('elec_convMC_all_l_pt_coarse', iF[p], el_convSF)) for p in processes)
     eff_qcd  = dict((p, brsit('elec_qcdMC_all_l_pt_coarse',  iF[p], el_qcdSF))  for p in processes)
     eff_real = dict((p, brsit('elec_realMC_all_l_pt_coarse', iF[p], el_realSF)) for p in processes)
-    el_frac = dict()
+    el_frac, el_count = dict(), dict()
     for sr in selectionRegions() :
-        frac_conv, frac_qcd= buildPercentagesTwice(inputFiles, 'elec_'+sr+'_all_flavor_den',
-                                                   'conv', 'qcd')
-        frac_real = buildPercentages(inputFiles, 'elec_'+sr+'_all_flavor_den', 'real')
+        cnts_real = getCounts(inputFiles, 'elec_'+sr+'_all_flavor_den', 'real')
+        cnts_conv = getCounts(inputFiles, 'elec_'+sr+'_all_flavor_den', 'conv')
+        cnts_qcd  = getCounts(inputFiles, 'elec_'+sr+'_all_flavor_den', 'qcd')
+        frac_real           = buildPercentages(cnts_real)
+        frac_conv, frac_qcd = buildPercentagesTwice(cnts_conv, cnts_qcd)
         if verbose : print "el : sr ",sr,"\n frac_conv : ",frac2str(frac_conv)
         if verbose : print "el : sr ",sr,"\n frac_qcd  : ",frac2str(frac_qcd )
         if verbose : print "el : sr ",sr,"\n frac_real : ",frac2str(frac_real)
@@ -228,7 +227,8 @@ def buildElectronRates(inputFiles, outputfile, outplotdir, verbose=False) :
         outputfile.cd()
         fake.Write()
         real.Write()
-        el_frac[sr] = {'conv' : frac_conv, 'qcd' : frac_qcd, 'real' : frac_real}
+        el_count[sr] = {'conv' : cnts_conv, 'qcd' : cnts_qcd, 'real' : cnts_real}
+        el_frac [sr] = {'conv' : frac_conv, 'qcd' : frac_qcd, 'real' : frac_real}
     #json_write(el_frac, outFracFilename)
     plotFractions(el_frac, outplotdir, 'el')
 def buildEtaSyst(inputFileTotMc, inputHistoBaseName='(elec|muon)_qcdMC_all', outputHistoName='') :
