@@ -201,7 +201,8 @@ def buildMuonRates(inputFiles, outputfile, outplotdir, verbose=False) :
         mu_count[sr] = {'qcd' : cnts_qcd, 'real' : cnts_real}
         mu_frac [sr] = {'qcd' : frac_qcd, 'real' : frac_real}
     #json_write(mu_frac, outplotdir+/outFracFilename)
-    plotFractions(mu_frac, mu_count, outplotdir, 'mu')
+    plotFractions(fractDict=mu_frac, outplotdir=outplotdir, prefix='mu')
+
 def buildElectronRates(inputFiles, outputfile, outplotdir, verbose=False) :
     """
     For each selection region, build the real eff and fake rate
@@ -233,7 +234,8 @@ def buildElectronRates(inputFiles, outputfile, outplotdir, verbose=False) :
         el_count[sr] = {'conv' : cnts_conv, 'qcd' : cnts_qcd, 'real' : cnts_real}
         el_frac [sr] = {'conv' : frac_conv, 'qcd' : frac_qcd, 'real' : frac_real}
     #json_write(el_frac, outFracFilename)
-    plotFractions(el_frac, el_count, outplotdir, 'el')
+    plotFractions(fractDict=el_frac, outplotdir=outplotdir, prefix='el')
+
 def buildEtaSyst(inputFileTotMc, inputHistoBaseName='(elec|muon)_qcdMC_all', outputHistoName='') :
     """
     Take the eta distribution and normalize it to the average fake
@@ -281,8 +283,6 @@ def plotFractions(fractDict={}, countDict={}, outplotdir='./', prefix='') :
     colors = dict(zip(samples, ['b','g','r','c','m','y']))
     for lt in leptypes :
         fracPerSample = dict((s, np.array([fractDict[r][lt][s] for r in regions])) for s in samples)
-        cntPerSample  = dict((s,          [countDict[r][lt][s] for r in regions])  for s in samples)
-        cntPerRegion = dict((r, sum([countDict[r][lt][s] for s in samples])) for r in regions)
         below = np.zeros(len(regions))
         plots = []
         fig, ax = plt.subplots()
@@ -294,8 +294,10 @@ def plotFractions(fractDict={}, countDict={}, outplotdir='./', prefix='') :
         plt.ylabel('fractions')
         plt.title(prefix+' '+lt+' compositions')
         plt.xticks(binCenters, regions)
-        for i,r in enumerate(regions) :
-            ax.text(binCenters[i], 0.5, "%.1f"%cntPerRegion[r], ha='center', va='center', rotation='vertical')
+        if countDict :
+            for i,r in enumerate(regions) :
+                cntPerRegion = sum([countDict[r][lt][s] for s in samples])
+                ax.text(binCenters[i], 0.5, "%.1f"%cntPerRegion[r], ha='center', va='center', rotation='vertical')
         plt.ylim((0.0, 1.0))
         plt.grid(True)
         plt.yticks(np.arange(0.0, 1.0, 0.2))
