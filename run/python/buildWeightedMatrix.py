@@ -264,12 +264,12 @@ def buildSystematics(inputFileTotMc, outputfile) :
               el_region, mu_region, el_eta, mu_eta ]
     outputfile.cd()
     for o in  allSys : o.Write()
-def plotFractions(fractDict={}, outplotdir='./', prefix='') :
+def plotFractions(fractDict={}, countDict={}, outplotdir='./', prefix='') :
     """
     input : fractDict[sr][lep_type][sample] = float
     """
     outplotdir = outplotdir if outplotdir.endswith('/') else outplotdir+'/'
-    def isInterestingRegion(r) : return any(k in r for k in ['CR8', 'WHSS', 'SSInc', 'SsEwk'])
+    def isInterestingRegion(r) : return any(k in r for k in ['CR8', 'WHSS', 'SSInc', 'SsEwk',])
     regions  = [r for r in selectionRegions() if isInterestingRegion(r)]
     leptypes = sorted(first(fractDict).keys())
     samples  = sorted(first(first(fractDict)).keys())
