@@ -659,8 +659,11 @@ bool MeasureFakeRate2::passHFCR_testSs(const LeptonVector &leptons,
     size_t nTags=0;
     //bool passSingleMu(false); // DG 2014-03-30: do we need this?
     bool passDilepMuMu(false), passDilepMuEm(false), passDilepEmMu(false);
-    for(size_t iTag=0; iTag<m_baseMuons.size(); ++iTag){
-        if(const Muon *m = m_baseMuons[iTag]){
+//     for(size_t iTag=0; iTag<m_baseMuons.size(); ++iTag){
+//         if(const Muon *m = m_baseMuons[iTag]){
+    MuonVector preMuons = getPreMuons(&nt, NtSys_NOM);
+    for(size_t iTag=0; iTag<preMuons.size(); ++iTag){
+        if(const Muon *m = preMuons[iTag]){
             uint tf = m->trigFlags;
             passDilepMuMu = (tf & TRIG_mu18_tight_mu8_EFFS);
             passDilepMuEm = (tf & TRIG_mu18_tight_e7_medium1);
