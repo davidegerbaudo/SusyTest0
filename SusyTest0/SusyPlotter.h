@@ -9,6 +9,9 @@
 #include "TH1F.h"
 #include "TH2F.h"
 
+#include <map>
+#include <string>
+
 /*!
     SusyPlotter - class for making analysis histograms
 */
@@ -55,6 +58,7 @@ class SusyPlotter : public SusySelection
   bool                m_doProcessSystematics;
   bool                m_fillHft;
   susy::wh::HftFiller m_hftFiller;
+    std::map<std::string, int> m_fsCounter;
 
   // preprocessor convenience - add more indices later
 #define DEFHIST( name ) h_ ## name[susy::wh::Ch_N][susy::wh::kNumberOfPlotRegions][40/*Guess for # of sys*/];

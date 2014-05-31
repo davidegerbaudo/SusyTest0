@@ -82,6 +82,43 @@ void SusyPlotter::Begin(TTree* /*tree*/)
   toggleNominal();
   if(m_doProcessSystematics) toggleStdSystematics();
   initHistos();
+  m_fsCounter["unknown" ] = 0;
+  m_fsCounter["Zee"     ] = 0;
+  m_fsCounter["Zmumu"   ] = 0;
+  m_fsCounter["Ztautau" ] = 0;
+  m_fsCounter["emutau"  ] = 0;
+}
+//-----------------------------------------
+size_t fillTruthLeptons(SusyNtObject* susyNt, TruthParticleVector& leptons, int pdg)
+{
+    size_t nFound=0;
+    for(uint index=0; index<susyNt->tpr()->size(); ++index){
+        TruthParticle* particle = & susyNt->tpr()->at(index);
+        if(fabs(particle->pdgId) == pdg
+           //&& particle->Pt()>20.0
+            ) {
+            nFound += 1;
+            leptons.push_back(particle);
+        }
+    }
+    return nFound;
+}
+std::string getFinalState(SusyNtObject* susyNt)
+{
+    string finalState="unknown";
+    TruthParticleVector electrons, muons, taus;
+    fillTruthLeptons(susyNt, electrons, 11);
+    fillTruthLeptons(susyNt, muons,     13);
+    fillTruthLeptons(susyNt, taus,      15);
+    size_t nEl(electrons.size()), nMu(muons.size()), nTau(taus.size());
+    if((nEl+nMu+nTau)>3)
+        cout<<"leptons : nEl "<<nEl<<" nMu "<<nMu<<" nTau "<<nTau<<endl;
+    if     (nEl>=2  )  finalState = "Zee";
+    else if(nMu>=2  )  finalState = "Zmumu";
+    else if(nTau>=2 )  finalState = "Ztautau";
+    else if(nEl==1 && nMu==1 && nTau==1) finalState = "emutau";
+    else cout<<"unknown : nEl "<<nEl<<" nMu "<<nMu<<" nTau "<<nTau<<endl;
+    return finalState;
 }
 //-----------------------------------------
 Bool_t SusyPlotter::Process(Long64_t entry)
@@ -125,6 +162,7 @@ Bool_t SusyPlotter::Process(Long64_t entry)
       if(!passBaseline) continue;
       bool is1j(ssf.eq1j), is2j(ssf.ge2j);
       bool fillOldHistograms = false; // avoid filling old histos with all SRs when doing HFT (run out of memory)
+      if(sys==NtSys_NOM && SusySelection::isEventForHft(v, ssf)) { m_fsCounter[getFinalState(&nt)] += 1;}
       if(m_fillHft) {
           if(SusySelection::isEventForHft(v, ssf)) {
               if(sys==NtSys_NOM) fillHftNominal(v, ncl, j, *m);
@@ -173,6 +211,14 @@ void SusyPlotter::Terminate()
   if(m_fillHft) closeHftFiller();
   m_histFile->Write();
   m_histFile->Close();
+  cout<<"---------------------"<<endl;
+  cout<<"final state counters:"<<endl;
+  cout<<"unknown   :"<<m_fsCounter["unknown" ]<<endl;
+  cout<<"Zee       :"<<m_fsCounter["Zee"     ]<<endl;
+  cout<<"Zmumu     :"<<m_fsCounter["Zmumu"   ]<<endl;
+  cout<<"Ztautau   :"<<m_fsCounter["Ztautau" ]<<endl;
+  cout<<"emutau    :"<<m_fsCounter["emutau"  ]<<endl;
+  cout<<"---------------------"<<endl;
 }
 //----------------------------------------------------------
 SusyPlotter& SusyPlotter::setOutputFilename(const std::string &name)
