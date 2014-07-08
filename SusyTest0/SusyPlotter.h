@@ -9,6 +9,9 @@
 #include "TH1F.h"
 #include "TH2F.h"
 
+//class MultijetJESUncertaintyProvider;
+#include "JetUncertainties/MultijetJESUncertaintyProvider.h"
+
 /*!
     SusyPlotter - class for making analysis histograms
 */
@@ -42,9 +45,12 @@ class SusyPlotter : public SusySelection
   susy::wh::HftFiller::WeightVariations  computeWeightVariations(cvl_t& leptons, cvj_t& jets, const Met &met); //!< compute the weight syst variations
   bool isHftFillerInitialized() const { return m_systNames.size() == m_hftFiller.nTrees(); }
   void initHftFiller();
+  void initJesProvider();
   void fillHftNominal(const susy::wh::kin::DilepVars &v, cvl_t& leptons, cvj_t& jets, const Met &met);
   void fillHft(const size_t sys, const susy::wh::kin::DilepVars &v);
   void closeHftFiller();
+  void selectJesFixObjects(SusyNtSys sys, bool removeLepsFromIso, TauID signalTauID, bool n0150BugFix);
+
   virtual std::string hftTreeName() const;
 
  protected:
@@ -55,6 +61,7 @@ class SusyPlotter : public SusySelection
   bool                m_doProcessSystematics;
   bool                m_fillHft;
   susy::wh::HftFiller m_hftFiller;
+  MultijetJESUncertaintyProvider* m_jesProvider;
 
   // preprocessor convenience - add more indices later
 #define DEFHIST( name ) h_ ## name[susy::wh::Ch_N][susy::wh::kNumberOfPlotRegions][40/*Guess for # of sys*/];
