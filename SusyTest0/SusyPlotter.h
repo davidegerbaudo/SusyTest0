@@ -11,6 +11,7 @@
 
 //class MultijetJESUncertaintyProvider;
 #include "JetUncertainties/MultijetJESUncertaintyProvider.h"
+#include "ApplyJetResolutionSmearing/ApplyJetSmearing.h"
 
 /*!
     SusyPlotter - class for making analysis histograms
@@ -46,6 +47,7 @@ class SusyPlotter : public SusySelection
   bool isHftFillerInitialized() const { return m_systNames.size() == m_hftFiller.nTrees(); }
   void initHftFiller();
   void initJesProvider();
+  void initJerSmearingTool();
   void fillHftNominal(const susy::wh::kin::DilepVars &v, cvl_t& leptons, cvj_t& jets, const Met &met);
   void fillHft(const size_t sys, const susy::wh::kin::DilepVars &v);
   void closeHftFiller();
@@ -62,6 +64,7 @@ class SusyPlotter : public SusySelection
   bool                m_fillHft;
   susy::wh::HftFiller m_hftFiller;
   MultijetJESUncertaintyProvider* m_jesProvider;
+  JetSmearingTool* m_jerSmearingTool;
 
   // preprocessor convenience - add more indices later
 #define DEFHIST( name ) h_ ## name[susy::wh::Ch_N][susy::wh::kNumberOfPlotRegions][40/*Guess for # of sys*/];

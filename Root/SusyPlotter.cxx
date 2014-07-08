@@ -85,6 +85,7 @@ void SusyPlotter::Begin(TTree* /*tree*/)
   if(m_doProcessSystematics) toggleStdSystematics();
   initHistos();
   initJesProvider();
+  initJerSmearingTool();
 }
 //-----------------------------------------
 Bool_t SusyPlotter::Process(Long64_t entry)
@@ -103,7 +104,7 @@ Bool_t SusyPlotter::Process(Long64_t entry)
       bool removeLepsFromIso(false);
       clearObjects();
       bool n0150BugFix=true;
-      if(sys==NtSys_JES_UP || sys==NtSys_JES_DN)
+      if(sys==NtSys_JES_UP || sys==NtSys_JES_DN || sys==NtSys_JER)
           selectJesFixObjects(sys, removeLepsFromIso, TauID_medium, n0150BugFix);
       else
           selectObjects(sys, removeLepsFromIso, TauID_medium, n0150BugFix);
@@ -353,7 +354,7 @@ void SusyPlotter::toggleStdSystematics()
 //--    m_systs.push_back(NtSys_ID_DN       ); m_systNames.push_back(SusyNtSystNames[NtSys_ID_DN       ]);
     m_systs.push_back(NtSys_JES_UP      ); m_systNames.push_back(SusyNtSystNames[NtSys_JES_UP      ]);
     m_systs.push_back(NtSys_JES_DN      ); m_systNames.push_back(SusyNtSystNames[NtSys_JES_DN      ]);
-//--    m_systs.push_back(NtSys_JER         ); m_systNames.push_back(SusyNtSystNames[NtSys_JER         ]);
+    m_systs.push_back(NtSys_JER         ); m_systNames.push_back(SusyNtSystNames[NtSys_JER         ]);
 //--    m_systs.push_back(NtSys_SCALEST_UP  ); m_systNames.push_back(SusyNtSystNames[NtSys_SCALEST_UP  ]);
 //--    m_systs.push_back(NtSys_SCALEST_DN  ); m_systNames.push_back(SusyNtSystNames[NtSys_SCALEST_DN  ]);
 //--    m_systs.push_back(NtSys_RESOST      ); m_systNames.push_back(SusyNtSystNames[NtSys_RESOST      ]);
@@ -637,10 +638,26 @@ void SusyPlotter::initJesProvider()
 //-----------------------------------------
 void SusyPlotter::selectJesFixObjects(SusyNtSys sys, bool removeLepsFromIso, TauID signalTauID, bool n0150BugFix)
 {
-    if(sys!=NtSys_JES_UP && sys!=NtSys_JES_DN)
-        cout<<"SusyPlotter::selectJesFixObjects should be called only for JES_UP and JES_DN"
+    if(sys!=NtSys_JES_UP && sys!=NtSys_JES_DN && sys!=NtSys_JER)
+        cout<<"SusyPlotter::selectJesFixObjects should be called only for JES_UP, JES_DN, JER"
             <<" ("<<SusyNtSystNames[sys]<<")"<<endl;
-    else{
+    else if(sys==NtSys_JER){
+        selectObjects(NtSys_NOM, removeLepsFromIso, TauID_medium, n0150BugFix);
+        if(m_jerSmearingTool){
+            for(size_t iJet=0; iJet<m_baseJets.size(); ++iJet){
+                Susy::Jet* jet = m_baseJets[iJet];
+                TLorentzVector lvjet = *jet;
+                int seed = int(fabs(lvjet.Phi()*1.e+5)); // crazy, see SUSYObjDef::ApplyJetSystematics
+                if(!seed) ++seed;
+                m_jerSmearingTool->SetSeed(seed);
+                m_jerSmearingTool->SmearJet_Syst(lvjet);
+                jet->SetPtEtaPhiE(lvjet.Pt(), lvjet.Eta(), lvjet.Phi(), lvjet.E());
+            } // for(iJet)
+        } else {
+            cout<<"Error, missing jes provider"<<endl;
+        }
+
+    } else {
         selectObjects(NtSys_NOM, removeLepsFromIso, TauID_medium, n0150BugFix);
         if(m_jesProvider){
             float fCloseby = 0;
@@ -658,6 +675,18 @@ void SusyPlotter::selectJesFixObjects(SusyNtSys sys, bool removeLepsFromIso, Tau
         } else {
             cout<<"Error, missing jes provider"<<endl;
         }
+    }
+}
+//-----------------------------------------
+void SusyPlotter::initJerSmearingTool()
+{
+    bool jer_needed = (std::find(m_systs.begin(), m_systs.end(), NtSys_JER)!=m_systs.end());
+    if(jer_needed){
+        TString jetAlgo   = "AntiKt4LCTopo";
+        std::string JER_config_file = gSystem->ExpandPathName("${ROOTCOREBIN}/data/"
+                                                              "JetResolution/JERProviderPlots_2012.root");
+        m_jerSmearingTool = new JetSmearingTool(jetAlgo, JER_config_file);
+        m_jerSmearingTool->init();
     }
 }
 //-----------------------------------------
