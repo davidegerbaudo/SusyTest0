@@ -71,7 +71,9 @@ SusyPlotter::SusyPlotter() :
   SusySelection(),
   m_histFileName("susyPlotterOut.root"),
   m_histFile(0),
-  m_doProcessSystematics(false)
+  m_doProcessSystematics(false),
+  m_fillHft(false),
+  m_jesProvider(NULL)
 {
 }
 //-----------------------------------------
@@ -82,6 +84,7 @@ void SusyPlotter::Begin(TTree* /*tree*/)
   toggleNominal();
   if(m_doProcessSystematics) toggleStdSystematics();
   initHistos();
+  initJesProvider();
 }
 //-----------------------------------------
 Bool_t SusyPlotter::Process(Long64_t entry)
@@ -100,7 +103,10 @@ Bool_t SusyPlotter::Process(Long64_t entry)
       bool removeLepsFromIso(false);
       clearObjects();
       bool n0150BugFix=true;
-      selectObjects(sys, removeLepsFromIso, TauID_medium, n0150BugFix);
+      if(sys==NtSys_JES_UP || sys==NtSys_JES_DN)
+          selectJesFixObjects(sys, removeLepsFromIso, TauID_medium, n0150BugFix);
+      else
+          selectObjects(sys, removeLepsFromIso, TauID_medium, n0150BugFix);
       swh::EventFlags eventFlags(computeEventFlags());
       if(sys==NtSys_NOM) incrementCounters(eventFlags, m_weightComponents);
       if(eventFlags.failAny()) continue;
@@ -337,26 +343,26 @@ void SusyPlotter::toggleNominal()
 //-----------------------------------------
 void SusyPlotter::toggleStdSystematics()
 {
-    m_systs.push_back(NtSys_EES_Z_UP    ); m_systNames.push_back(SusyNtSystNames[NtSys_EES_Z_UP    ]);
-    m_systs.push_back(NtSys_EES_Z_DN    ); m_systNames.push_back(SusyNtSystNames[NtSys_EES_Z_DN    ]);
-    m_systs.push_back(NtSys_EES_MAT_UP  ); m_systNames.push_back(SusyNtSystNames[NtSys_EES_MAT_UP  ]);
-    m_systs.push_back(NtSys_EES_MAT_DN  ); m_systNames.push_back(SusyNtSystNames[NtSys_EES_MAT_DN  ]);
-    m_systs.push_back(NtSys_EES_PS_UP   ); m_systNames.push_back(SusyNtSystNames[NtSys_EES_PS_UP   ]);
-    m_systs.push_back(NtSys_EES_PS_DN   ); m_systNames.push_back(SusyNtSystNames[NtSys_EES_PS_DN   ]);
-    m_systs.push_back(NtSys_EES_LOW_UP  ); m_systNames.push_back(SusyNtSystNames[NtSys_EES_LOW_UP  ]);
-    m_systs.push_back(NtSys_EES_LOW_DN  ); m_systNames.push_back(SusyNtSystNames[NtSys_EES_LOW_DN  ]);
-    m_systs.push_back(NtSys_EER_UP      ); m_systNames.push_back(SusyNtSystNames[NtSys_EER_UP      ]);
-    m_systs.push_back(NtSys_EER_DN      ); m_systNames.push_back(SusyNtSystNames[NtSys_EER_DN      ]);
-    m_systs.push_back(NtSys_MS_UP       ); m_systNames.push_back(SusyNtSystNames[NtSys_MS_UP       ]);
-    m_systs.push_back(NtSys_MS_DN       ); m_systNames.push_back(SusyNtSystNames[NtSys_MS_DN       ]);
-    m_systs.push_back(NtSys_ID_UP       ); m_systNames.push_back(SusyNtSystNames[NtSys_ID_UP       ]);
-    m_systs.push_back(NtSys_ID_DN       ); m_systNames.push_back(SusyNtSystNames[NtSys_ID_DN       ]);
+//--    m_systs.push_back(NtSys_EES_Z_UP    ); m_systNames.push_back(SusyNtSystNames[NtSys_EES_Z_UP    ]);
+//--    m_systs.push_back(NtSys_EES_Z_DN    ); m_systNames.push_back(SusyNtSystNames[NtSys_EES_Z_DN    ]);
+//--    m_systs.push_back(NtSys_EES_MAT_UP  ); m_systNames.push_back(SusyNtSystNames[NtSys_EES_MAT_UP  ]);
+//--    m_systs.push_back(NtSys_EES_MAT_DN  ); m_systNames.push_back(SusyNtSystNames[NtSys_EES_MAT_DN  ]);
+//--    m_systs.push_back(NtSys_EES_PS_UP   ); m_systNames.push_back(SusyNtSystNames[NtSys_EES_PS_UP   ]);
+//--    m_systs.push_back(NtSys_EES_PS_DN   ); m_systNames.push_back(SusyNtSystNames[NtSys_EES_PS_DN   ]);
+//--    m_systs.push_back(NtSys_EES_LOW_UP  ); m_systNames.push_back(SusyNtSystNames[NtSys_EES_LOW_UP  ]);
+//--    m_systs.push_back(NtSys_EES_LOW_DN  ); m_systNames.push_back(SusyNtSystNames[NtSys_EES_LOW_DN  ]);
+//--    m_systs.push_back(NtSys_EER_UP      ); m_systNames.push_back(SusyNtSystNames[NtSys_EER_UP      ]);
+//--    m_systs.push_back(NtSys_EER_DN      ); m_systNames.push_back(SusyNtSystNames[NtSys_EER_DN      ]);
+//--    m_systs.push_back(NtSys_MS_UP       ); m_systNames.push_back(SusyNtSystNames[NtSys_MS_UP       ]);
+//--    m_systs.push_back(NtSys_MS_DN       ); m_systNames.push_back(SusyNtSystNames[NtSys_MS_DN       ]);
+//--    m_systs.push_back(NtSys_ID_UP       ); m_systNames.push_back(SusyNtSystNames[NtSys_ID_UP       ]);
+//--    m_systs.push_back(NtSys_ID_DN       ); m_systNames.push_back(SusyNtSystNames[NtSys_ID_DN       ]);
     m_systs.push_back(NtSys_JES_UP      ); m_systNames.push_back(SusyNtSystNames[NtSys_JES_UP      ]);
     m_systs.push_back(NtSys_JES_DN      ); m_systNames.push_back(SusyNtSystNames[NtSys_JES_DN      ]);
-    m_systs.push_back(NtSys_JER         ); m_systNames.push_back(SusyNtSystNames[NtSys_JER         ]);
-    m_systs.push_back(NtSys_SCALEST_UP  ); m_systNames.push_back(SusyNtSystNames[NtSys_SCALEST_UP  ]);
-    m_systs.push_back(NtSys_SCALEST_DN  ); m_systNames.push_back(SusyNtSystNames[NtSys_SCALEST_DN  ]);
-    m_systs.push_back(NtSys_RESOST      ); m_systNames.push_back(SusyNtSystNames[NtSys_RESOST      ]);
+//--    m_systs.push_back(NtSys_JER         ); m_systNames.push_back(SusyNtSystNames[NtSys_JER         ]);
+//--    m_systs.push_back(NtSys_SCALEST_UP  ); m_systNames.push_back(SusyNtSystNames[NtSys_SCALEST_UP  ]);
+//--    m_systs.push_back(NtSys_SCALEST_DN  ); m_systNames.push_back(SusyNtSystNames[NtSys_SCALEST_DN  ]);
+//--    m_systs.push_back(NtSys_RESOST      ); m_systNames.push_back(SusyNtSystNames[NtSys_RESOST      ]);
 //     m_systs.push_back(NtSys_TRIGSF_EL_UP); m_systNames.push_back(SusyNtSystNames[NtSys_TRIGSF_EL_UP]);
 //     m_systs.push_back(NtSys_TRIGSF_EL_DN); m_systNames.push_back(SusyNtSystNames[NtSys_TRIGSF_EL_DN]);
 //     m_systs.push_back(NtSys_TRIGSF_MU_UP); m_systNames.push_back(SusyNtSystNames[NtSys_TRIGSF_MU_UP]);
@@ -617,5 +623,47 @@ std::string SusyPlotter::hftTreeName() const
     if(nt.evt()->isMC) oss<<nt.evt()->mcChannel;
     else               oss<<sampleName();
     return string(oss.str());
+}
+//-----------------------------------------
+void SusyPlotter::initJesProvider()
+{
+    bool jes_needed = (std::find(m_systs.begin(), m_systs.end(), NtSys_JES_UP)!=m_systs.end() ||
+                       std::find(m_systs.begin(), m_systs.end(), NtSys_JES_DN)!=m_systs.end() );
+    if(jes_needed){
+        string maindir = gSystem->ExpandPathName("${ROOTCOREBIN}/data/");
+        string jetAlgo = "AntiKt4LCTopo";
+        string multijes_file = "JES_2012/Moriond2013/MultijetJES_2012.config";
+        string jes_file = "JES_2012/Moriond2013/InsituJES2012_14NP.config";
+        string jes_path = maindir + "JetUncertainties/";
+        string mcType = "MC12a";
+        m_jesProvider = new MultijetJESUncertaintyProvider(multijes_file, jes_file, jetAlgo, mcType, jes_path);
+        cout << "JES Uncertainty Provider--> reading file" << jes_file << endl;
+    }
+}
+//-----------------------------------------
+void SusyPlotter::selectJesFixObjects(SusyNtSys sys, bool removeLepsFromIso, TauID signalTauID, bool n0150BugFix)
+{
+    if(sys!=NtSys_JES_UP && sys!=NtSys_JES_DN)
+        cout<<"SusyPlotter::selectJesFixObjects should be called only for JES_UP and JES_DN"
+            <<" ("<<SusyNtSystNames[sys]<<")"<<endl;
+    else{
+        selectObjects(NtSys_NOM, removeLepsFromIso, TauID_medium, n0150BugFix);
+        if(m_jesProvider){
+            float fCloseby = 0;
+            bool jes_up_do = (sys==NtSys_JES_UP);
+            for(size_t iJet=0; iJet<m_baseJets.size(); ++iJet){
+                Susy::Jet* jet = m_baseJets[iJet];
+                bool is_bjet = (jet->truthLabel==5);
+                unsigned int nVtx = nt.evt()->nVtx;
+                float avgMu = nt.evt()->avgMu;
+                float pt(jet->Pt()), eta(jet->Eta());
+                double unc = m_jesProvider->getRelUncert(pt, eta, fCloseby, jes_up_do, nVtx, avgMu, is_bjet);
+                double sf = 1.0 + (jes_up_do? +1.0 : -1.0)*unc;
+                jet->SetPtEtaPhiE(sf * jet->Pt(), jet->Eta(), jet->Phi(), sf * jet->E());
+            } // for(iJet)
+        } else {
+            cout<<"Error, missing jes provider"<<endl;
+        }
+    }
 }
 //-----------------------------------------
