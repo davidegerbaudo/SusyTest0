@@ -5,6 +5,7 @@
 #include "SusyTest0/SusySelection.h"
 #include "SusyTest0/PlotRegion.h"
 #include "SusyTest0/HftFiller.h"
+#include "SusyTest0/JesSystematicBreakdown.h"
 
 #include "TH1F.h"
 #include "TH2F.h"
@@ -30,19 +31,21 @@ class SusyPlotter : public SusySelection
   float Mt(TLorentzVector p1, TLorentzVector met) {
     return sqrt(2*p1.Pt()*met.Et()*(1-cos(p1.DeltaPhi(met))));
   };
-  void toggleNominal(); //!< create and fill the nominal histos
-  void toggleStdSystematics(); //!< create and fill the nominal histos and the ones for the systematic variations
-  void toggleFakeSystematics(); //!< create and fill the histos needed for the fake systematic
-  void initHistos();
   
  public:
   SusyPlotter& setOutputFilename(const std::string &name);
-  SusyPlotter& toggleSystematics();
+  SusyPlotter& enableSystematics(); //!< create and fill the nominal histos and the ones for the systematic variations
+  SusyPlotter& enableJesComponentsSystematics();  ///< create and fill the histos needed for the JES-breakdown syst
   SusyPlotter& toggleHistFitterTrees(); //!< create and fill the histos needed for the fake systematic
   
   ClassDef(SusyPlotter, 1);
 
  protected:
+  void toggleNominal(); //!< create and fill the nominal histos
+  void toggleStdSystematics();
+  void toggleFakeSystematics(); //!< create and fill the histos needed for the fake systematic
+  void toggleJesComponentsSystematics();
+  void initHistos();
   susy::wh::HftFiller::WeightVariations  computeWeightVariations(cvl_t& leptons, cvj_t& jets, const Met &met); //!< compute the weight syst variations
   bool isHftFillerInitialized() const { return m_systNames.size() == m_hftFiller.nTrees(); }
   void initHftFiller();
@@ -52,6 +55,11 @@ class SusyPlotter : public SusySelection
   void fillHft(const size_t sys, const susy::wh::kin::DilepVars &v);
   void closeHftFiller();
   void selectJesFixObjects(SusyNtSys sys, bool removeLepsFromIso, TauID signalTauID, bool n0150BugFix);
+  /// compute the JES uncertainty broken down in components
+  float computeJesBreakdownUncertainty(float jetPt, float constEta, float nPvx2Tk, float mu,
+                                       susy::wh::JesSystematicComponents sys);
+  void selectJesBreakdownSysObjects(susy::wh::JesSystematicComponents sys,
+                                    bool removeLepsFromIso, TauID signalTauID, bool n0150BugFix);
 
   virtual std::string hftTreeName() const;
 
@@ -61,6 +69,7 @@ class SusyPlotter : public SusySelection
   std::string         m_histFileName;       // output histo file name
   TFile*              m_histFile;           // output histo file
   bool                m_doProcessSystematics;
+  bool                m_doProcessJesSystematics;
   bool                m_fillHft;
   susy::wh::HftFiller m_hftFiller;
   MultijetJESUncertaintyProvider* m_jesProvider;

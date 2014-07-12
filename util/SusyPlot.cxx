@@ -23,16 +23,17 @@ using std::string;
 void usage(const char *exeName) {
   cout<<"Usage:"<<endl
       <<exeName<<" options"<<endl
-      <<"\t"<<"-n [--num-event]   nEvt (default -1, all)"<<endl
-      <<"\t"<<"-k [--num-skip]    nSkip (default 0)"     <<endl
-      <<"\t"<<"-i [--input]       (file, list, or dir)"  <<endl
-      <<"\t"<<"-o [--output]      samplename"            <<endl
-      <<"\t"<<"-s [--sample]      output file"           <<endl
-      <<"\t"<<"-S [--with-syst]   fill also syst histos" <<endl
-      <<"\t"<<"-T [--with-hft]    fill also HFT trees"   <<endl
-      <<"\t"<<"-d [--debug]     : debug (>0 print stuff)"<<endl
-      <<"\t"<<"-h [--help]      : print help"            <<endl
-      <<"\t"<<"--WH-sample      : xsec from SusyXSReader"<<endl
+      <<"\t"<<"-n [--num-event]   nEvt (default -1, all)"     <<endl
+      <<"\t"<<"-k [--num-skip]    nSkip (default 0)"          <<endl
+      <<"\t"<<"-i [--input]       (file, list, or dir)"       <<endl
+      <<"\t"<<"-o [--output]      samplename"                 <<endl
+      <<"\t"<<"-s [--sample]      output file"                <<endl
+      <<"\t"<<"-S [--with-syst]   fill also syst histos"      <<endl
+      <<"\t"<<"-J [--with-jessyst] process JES components sys"<<endl
+      <<"\t"<<"-T [--with-hft]    fill also HFT trees"        <<endl
+      <<"\t"<<"-d [--debug]     : debug (>0 print stuff)"     <<endl
+      <<"\t"<<"-h [--help]      : print help"                 <<endl
+      <<"\t"<<"--WH-sample      : xsec from SusyXSReader"     <<endl
       <<endl;
 }
 
@@ -53,6 +54,7 @@ int main(int argc, char** argv)
   string output;
   bool useSusyXSReader = false;
   bool doSyst = false;
+  bool doJesSyst = false;
   bool doHft = false;
 
   int optind(1);
@@ -63,16 +65,17 @@ int main(int argc, char** argv)
       continue;
     }
     std::string sw = argv[optind];
-    if     (sw=="-n"||sw=="--num-event"  ) { nEvt = atoi(argv[++optind]); }
-    else if(sw=="-k"||sw=="--num-skip"   ) { nSkip = atoi(argv[++optind]); }
-    else if(sw=="-d"||sw=="--debug"      ) { dbg = atoi(argv[++optind]); }
-    else if(sw=="-i"||sw=="--input"      ) { input = argv[++optind]; }
-    else if(sw=="-o"||sw=="--output"     ) { output = argv[++optind]; }
-    else if(sw=="-s"||sw=="--sample"     ) { sample = argv[++optind]; }
-    else if(sw=="-S"||sw=="--with-syst"  ) { doSyst = true; }
-    else if(sw=="-T"||sw=="--with-hft"   ) { doHft = true; }
-    else if(sw=="-h"||sw=="--help"       ) { usage(argv[0]); return 0; }
-    else if(sw=="--WH-sample"            ) { useSusyXSReader = true; }
+    if     (sw=="-n"||sw=="--num-event"    ) { nEvt = atoi(argv[++optind]); }
+    else if(sw=="-k"||sw=="--num-skip"     ) { nSkip = atoi(argv[++optind]); }
+    else if(sw=="-d"||sw=="--debug"        ) { dbg = atoi(argv[++optind]); }
+    else if(sw=="-i"||sw=="--input"        ) { input = argv[++optind]; }
+    else if(sw=="-o"||sw=="--output"       ) { output = argv[++optind]; }
+    else if(sw=="-s"||sw=="--sample"       ) { sample = argv[++optind]; }
+    else if(sw=="-S"||sw=="--with-syst"    ) { doSyst = true; }
+    else if(sw=="-J"||sw=="--with-jessyst" ) { doJesSyst = true; }
+    else if(sw=="-T"||sw=="--with-hft"     ) { doHft = true; }
+    else if(sw=="-h"||sw=="--help"         ) { usage(argv[0]); return 0; }
+    else if(sw=="--WH-sample"              ) { useSusyXSReader = true; }
     else cout<<"Unknown switch "<<sw<<endl;
     optind++;
   } // end while(optind<argc)
@@ -101,7 +104,8 @@ int main(int argc, char** argv)
   susyPlot->setDebug(dbg);
   susyPlot->setSampleName(sample);
   susyPlot->setUseXsReader(useSusyXSReader);
-  if(doSyst) susyPlot->toggleSystematics();
+  if(doSyst) susyPlot->enableSystematics();
+  if(doJesSyst) susyPlot->enableJesComponentsSystematics();
   if(doHft) susyPlot->toggleHistFitterTrees();
   if(output.length()) susyPlot->setOutputFilename(output);
   susyPlot->buildSumwMap(chain);

@@ -72,6 +72,7 @@ SusyPlotter::SusyPlotter() :
   m_histFileName("susyPlotterOut.root"),
   m_histFile(0),
   m_doProcessSystematics(false),
+  m_doProcessJesSystematics(false),
   m_fillHft(false),
   m_jesProvider(NULL)
 {
@@ -83,6 +84,7 @@ void SusyPlotter::Begin(TTree* /*tree*/)
   if(m_dbg) cout << "SusyPlotter::Begin" << endl;
   toggleNominal();
   if(m_doProcessSystematics) toggleStdSystematics();
+  if(m_doProcessJesSystematics) toggleJesComponentsSystematics();
   initHistos();
   initJesProvider();
   initJerSmearingTool();
@@ -101,10 +103,17 @@ Bool_t SusyPlotter::Process(Long64_t entry)
 
   for(size_t iSys=0; iSys<m_systs.size(); ++iSys) {
       const SusyNtSys sys = static_cast<SusyNtSys>(m_systs[iSys]);
+      const SusyNtSys sysWithJes = (m_doProcessJesSystematics ?
+                                    NtSys_NOM :
+                                    static_cast<SusyNtSys>(m_systs[iSys]));
+
       bool removeLepsFromIso(false);
       clearObjects();
       bool n0150BugFix=true;
-      if(sys==NtSys_JES_UP || sys==NtSys_JES_DN || sys==NtSys_JER)
+      if(m_doProcessJesSystematics && sys!=NtSys_NOM){
+          const susy::wh::JesSystematicComponents sysJes = static_cast<susy::wh::JesSystematicComponents>(m_systs[iSys]);
+          selectJesBreakdownSysObjects(sysJes, removeLepsFromIso, TauID_medium, n0150BugFix);
+      } else if (sys==NtSys_JES_UP || sys==NtSys_JES_DN || sys==NtSys_JER)
           selectJesFixObjects(sys, removeLepsFromIso, TauID_medium, n0150BugFix);
       else
           selectObjects(sys, removeLepsFromIso, TauID_medium, n0150BugFix);
@@ -118,7 +127,10 @@ Bool_t SusyPlotter::Process(Long64_t entry)
       LeptonVector&     ncl = m_signalLeptons; // non-const leptons: can be modified by qflip
       Met ncmet(*m_met); // non-const met
       const TauVector&    t = m_signalTaus;
-      if(l.size()>1) assignNonStaticWeightComponents(computeNonStaticWeightComponents(l, bj, swh::ntsys2sys(sys)));
+      if(l.size()>1)
+          assignNonStaticWeightComponents(
+              computeNonStaticWeightComponents(l, bj,
+                                               swh::ntsys2sys(m_doProcessJesSystematics? sysWithJes: sys)));
       else continue;
       bool allowQflip(true);
       VarFlag_t varsFlags(SusySelection::computeSsFlags(ncl, t, j, m, allowQflip));
@@ -192,11 +204,19 @@ SusyPlotter& SusyPlotter::setOutputFilename(const std::string &name)
   return *this;
 }
 //-----------------------------------------
-SusyPlotter& SusyPlotter::toggleSystematics()
+SusyPlotter& SusyPlotter::enableSystematics()
 {
     bool alreadyInitialized(m_histFile!=0);
-    if(alreadyInitialized) cout<<"SusyPlotter::toggleSystematics: cannot toggle systematics after histogram initialization"<<endl;
+    if(alreadyInitialized) cout<<"SusyPlotter::enableSystematics: cannot enable systematics after histogram initialization"<<endl;
     else m_doProcessSystematics = true;
+    return *this;
+}
+//-----------------------------------------
+SusyPlotter& SusyPlotter::enableJesComponentsSystematics()
+{
+    bool alreadyInitialized(m_histFile!=0);
+    if(alreadyInitialized) cout<<"SusyPlotter::enableJesComponentsSystematics: cannot enable systematics after histogram initialization"<<endl;
+    else m_doProcessJesSystematics = true;
     return *this;
 }
 //-----------------------------------------
@@ -380,7 +400,7 @@ void SusyPlotter::toggleFakeSystematics()
     // 'single-enum' implementation.
     namespace smm = SusyMatrixMethod;
     const std::string *sns = smm::systematic_names;
-    m_systs.push_back(smm::SYS_NOM      );  m_systNames.push_back(sns[smm::SYS_NOM      ]);
+    m_systs.push_back(smm::SYS_NOM       );  m_systNames.push_back(sns[smm::SYS_NOM      ]);
     m_systs.push_back(smm::SYS_EL_RE_UP  );  m_systNames.push_back(sns[smm::SYS_EL_RE_UP  ]);
     m_systs.push_back(smm::SYS_EL_RE_DOWN);  m_systNames.push_back(sns[smm::SYS_EL_RE_DOWN]);
     m_systs.push_back(smm::SYS_MU_RE_UP  );  m_systNames.push_back(sns[smm::SYS_MU_RE_UP  ]);
@@ -393,6 +413,55 @@ void SusyPlotter::toggleFakeSystematics()
     m_systs.push_back(smm::SYS_EL_FRAC_DO);  m_systNames.push_back(sns[smm::SYS_EL_FRAC_DO]);
     m_systs.push_back(smm::SYS_MU_FRAC_UP);  m_systNames.push_back(sns[smm::SYS_MU_FRAC_UP]);
     m_systs.push_back(smm::SYS_MU_FRAC_DO);  m_systNames.push_back(sns[smm::SYS_MU_FRAC_DO]);
+}
+//-----------------------------------------
+void SusyPlotter::toggleJesComponentsSystematics()
+{
+    m_doProcessJesSystematics = true;
+    namespace swh = susy::wh;
+    const std::map<swh::JesSystematicComponents, std::string> sns = swh::jesSystematicComponentsNames();
+    m_systs.push_back(swh::EffectiveNP_1_Up                      );
+    m_systs.push_back(swh::EffectiveNP_1_Down                    );
+    m_systs.push_back(swh::EffectiveNP_2_Up                      );
+    m_systs.push_back(swh::EffectiveNP_2_Down                    );
+    m_systs.push_back(swh::EffectiveNP_3_Up                      );
+    m_systs.push_back(swh::EffectiveNP_3_Down                    );
+    m_systs.push_back(swh::EffectiveNP_4_Up                      );
+    m_systs.push_back(swh::EffectiveNP_4_Down                    );
+    m_systs.push_back(swh::EffectiveNP_5_Up                      );
+    m_systs.push_back(swh::EffectiveNP_5_Down                    );
+    m_systs.push_back(swh::EffectiveNP_6_Up                      );
+    m_systs.push_back(swh::EffectiveNP_6_Down                    );
+    m_systs.push_back(swh::EtaIntercalibration_Modelling_Up      );
+    m_systs.push_back(swh::EtaIntercalibration_Modelling_Down    );
+    m_systs.push_back(swh::EtaIntercalibration_StatAndMethod_Up  );
+    m_systs.push_back(swh::EtaIntercalibration_StatAndMethod_Down);
+    m_systs.push_back(swh::SingleParticle_HighPt_Up              );
+    m_systs.push_back(swh::SingleParticle_HighPt_Down            );
+    m_systs.push_back(swh::RelativeNonClosure_Pythia8_Up         );
+    m_systs.push_back(swh::RelativeNonClosure_Pythia8_Down       );
+    m_systs.push_back(swh::PileupOffsetTermMuUp                  );
+    m_systs.push_back(swh::PileupOffsetTermMuDown                );
+    m_systs.push_back(swh::PileupOffsetTermNPVUp                 );
+    m_systs.push_back(swh::PileupOffsetTermNPVDown               );
+    m_systs.push_back(swh::PileupPtTermUp                        );
+    m_systs.push_back(swh::PileupPtTermDown                      );
+    m_systs.push_back(swh::PileupRhoTopologyUp                   );
+    m_systs.push_back(swh::PileupRhoTopologyDown                 );
+    m_systs.push_back(swh::CloseByUp                             );
+    m_systs.push_back(swh::CloseByDown                           );
+    m_systs.push_back(swh::FlavorCompUncertUp                    );
+    m_systs.push_back(swh::FlavorCompUncertDown                  );
+    m_systs.push_back(swh::FlavorResponseUncertUp                );
+    m_systs.push_back(swh::FlavorResponseUncertDown              );
+    m_systs.push_back(swh::BJesUp                                );
+    m_systs.push_back(swh::BJesDown                              );
+    std::vector<uint>::const_iterator it   = std::find(m_systs.begin(), m_systs.end(), swh::EffectiveNP_1_Up);
+    std::vector<uint>::const_iterator last = std::find(m_systs.begin(), m_systs.end(), swh::BJesDown)++;
+    last++; // include last element
+    for( ;it!=last; ++it)
+        m_systNames.push_back(swh::jesSystematicComponents2str(
+                                  static_cast<susy::wh::JesSystematicComponents>(*it)));
 }
 //-----------------------------------------
 void SusyPlotter::initHistos()
@@ -629,7 +698,8 @@ std::string SusyPlotter::hftTreeName() const
 void SusyPlotter::initJesProvider()
 {
     bool jes_needed = (std::find(m_systs.begin(), m_systs.end(), NtSys_JES_UP)!=m_systs.end() ||
-                       std::find(m_systs.begin(), m_systs.end(), NtSys_JES_DN)!=m_systs.end() );
+                       std::find(m_systs.begin(), m_systs.end(), NtSys_JES_DN)!=m_systs.end() ||
+                       m_doProcessJesSystematics);
     if(jes_needed){
         string maindir = gSystem->ExpandPathName("${ROOTCOREBIN}/data/");
         string jetAlgo = "AntiKt4LCTopo";
@@ -693,6 +763,74 @@ void SusyPlotter::initJerSmearingTool()
                                                               "JetResolution/JERProviderPlots_2012.root");
         m_jerSmearingTool = new JetSmearingTool(jetAlgo, JER_config_file);
         m_jerSmearingTool->init();
+    }
+}
+//-----------------------------------------
+float SusyPlotter::computeJesBreakdownUncertainty(float jetPt, float constEta, float nPvx2Tk, float mu,
+                                                  susy::wh::JesSystematicComponents sys)
+{
+    MultijetJESUncertaintyProvider *jes = m_jesProvider;
+    float fCloseby = 0;
+    float pt(jetPt), eta(constEta);
+    float updo=0.0;
+    float uncert=0.0;
+    if(jes){
+        if     (sys==EffectiveNP_1_Up)   { uncert=jes->getRelUncertComponent("EffectiveNP_1",pt,eta); updo=+1.0; }
+        else if(sys==EffectiveNP_1_Down) { uncert=jes->getRelUncertComponent("EffectiveNP_1",pt,eta); updo=-1.0; }
+        else if(sys==EffectiveNP_2_Up)   { uncert=jes->getRelUncertComponent("EffectiveNP_2",pt,eta); updo=+1.0; }
+        else if(sys==EffectiveNP_2_Down) { uncert=jes->getRelUncertComponent("EffectiveNP_2",pt,eta); updo=-1.0; }
+        else if(sys==EffectiveNP_3_Up)   { uncert=jes->getRelUncertComponent("EffectiveNP_3",pt,eta); updo=+1.0; }
+        else if(sys==EffectiveNP_3_Down) { uncert=jes->getRelUncertComponent("EffectiveNP_3",pt,eta); updo=-1.0; }
+        else if(sys==EffectiveNP_4_Up)   { uncert=jes->getRelUncertComponent("EffectiveNP_4",pt,eta); updo=+1.0; }
+        else if(sys==EffectiveNP_4_Down) { uncert=jes->getRelUncertComponent("EffectiveNP_4",pt,eta); updo=-1.0; }
+        else if(sys==EffectiveNP_5_Up)   { uncert=jes->getRelUncertComponent("EffectiveNP_5",pt,eta); updo=+1.0; }
+        else if(sys==EffectiveNP_5_Down) { uncert=jes->getRelUncertComponent("EffectiveNP_5",pt,eta); updo=-1.0; }
+        else if(sys==EffectiveNP_6_Up)   { uncert=jes->getRelUncertComponent("EffectiveNP_6restTerm",pt,eta); updo=+1.0; }
+        else if(sys==EffectiveNP_6_Down) { uncert=jes->getRelUncertComponent("EffectiveNP_6restTerm",pt,eta); updo=-1.0; }
+        else if(sys==EtaIntercalibration_Modelling_Up)     { uncert=jes->getRelUncertComponent("EtaIntercalibration_Modelling",pt,eta); updo=+1.0; }
+        else if(sys==EtaIntercalibration_Modelling_Down)   { uncert=jes->getRelUncertComponent("EtaIntercalibration_Modelling",pt,eta); updo=-1.0; }
+        else if(sys==EtaIntercalibration_StatAndMethod_Up)   { uncert=jes->getRelUncertComponent("EtaIntercalibration_StatAndMethod",pt,eta); updo=+1.0; }
+        else if(sys==EtaIntercalibration_StatAndMethod_Down) { uncert=jes->getRelUncertComponent("EtaIntercalibration_StatAndMethod",pt,eta); updo=-1.0; }
+        else if(sys==SingleParticle_HighPt_Up)   { uncert=jes->getRelUncertComponent("SingleParticle_HighPt",pt,eta); updo=+1.0; }
+        else if(sys==SingleParticle_HighPt_Down) { uncert=jes->getRelUncertComponent("SingleParticle_HighPt",pt,eta); updo=-1.0; }
+        else if(sys==RelativeNonClosure_Pythia8_Up)   { uncert=jes->getRelUncertComponent("RelativeNonClosure_Pythia8",pt,eta); updo=+1.0; }
+        else if(sys==RelativeNonClosure_Pythia8_Down) { uncert=jes->getRelUncertComponent("RelativeNonClosure_Pythia8",pt,eta); updo=-1.0; }
+        else if(sys==PileupOffsetTermMuUp)   { uncert=jes->getRelMuOffsetTerm(pt, eta, mu); updo=+1.0; }
+        else if(sys==PileupOffsetTermMuDown) { uncert=jes->getRelMuOffsetTerm(pt, eta, mu); updo=-1.0; }
+        else if(sys==PileupOffsetTermNPVUp)   { uncert=jes->getRelNPVOffsetTerm(pt, eta, nPvx2Tk); updo=+1.0; }
+        else if(sys==PileupOffsetTermNPVDown) { uncert=jes->getRelNPVOffsetTerm(pt, eta, nPvx2Tk); updo=-1.0; }
+        else if(sys==PileupPtTermUp)   { uncert=jes->getRelPileupPtTerm(pt, eta, nPvx2Tk,mu); updo=+1.0; }
+        else if(sys==PileupPtTermDown) { uncert=jes->getRelPileupPtTerm(pt, eta, nPvx2Tk,mu); updo=-1.0; }
+        else if(sys==PileupRhoTopologyUp)   { uncert=jes->getRelPileupRhoTopology(pt, eta); updo=+1.0; }
+        else if(sys==PileupRhoTopologyDown) { uncert=jes->getRelPileupRhoTopology(pt, eta); updo=-1.0; }
+        else if(sys==CloseByUp)   { uncert=jes->getRelClosebyUncert(pt,fCloseby); updo=+1.0; }
+        else if(sys==CloseByDown) { uncert=jes->getRelClosebyUncert(pt,fCloseby); updo=-1.0; }
+        else if(sys==FlavorCompUncertUp)   { uncert=jes->getRelFlavorCompUncert(pt,eta,true); updo=+1.0; }
+        else if(sys==FlavorCompUncertDown) { uncert=jes->getRelFlavorCompUncert(pt,eta,false); updo=-1.0; }
+        else if(sys==FlavorResponseUncertUp)   { uncert=jes->getRelFlavorResponseUncert(pt,eta); updo=+1.0; }
+        else if(sys==FlavorResponseUncertDown) { uncert=jes->getRelFlavorResponseUncert(pt,eta); updo=-1.0; }
+        else if(sys==BJesUp)   { uncert=jes->getRelBJESUncert(pt,eta); updo=+1.0; }
+        else if(sys==BJesDown) { uncert=jes->getRelBJESUncert(pt,eta); updo=-1.0; }
+    } else {
+        cout<<"invalid MultijetJESUncertaintyProvider"<<endl;
+    }
+    return updo*uncert;
+}
+//-----------------------------------------
+void SusyPlotter::selectJesBreakdownSysObjects(susy::wh::JesSystematicComponents sys, bool removeLepsFromIso, TauID signalTauID, bool n0150BugFix)
+{
+    // for details on the implementation, see also Steve's notes (email 2014-06-30 and his evernote link)
+    selectObjects(NtSys_NOM, removeLepsFromIso, TauID_medium, n0150BugFix);
+    if(m_jesProvider){
+        for(size_t iJet=0; iJet<m_baseJets.size(); ++iJet){
+            Susy::Jet* jet = m_baseJets[iJet];
+            unsigned int nVtx = nt.evt()->nVtx;
+            float avgMu = nt.evt()->avgMu;
+            float pt(jet->Pt()), eta(jet->detEta);
+            float unc = computeJesBreakdownUncertainty(pt, eta, nVtx, avgMu, sys);
+            float sf = 1.0 + unc;
+            jet->SetPtEtaPhiE(sf * jet->Pt(), jet->Eta(), jet->Phi(), sf * jet->E());
+        } // for(iJet)
     }
 }
 //-----------------------------------------
