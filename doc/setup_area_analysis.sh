@@ -56,7 +56,7 @@ svn co ${SUSY_URL}/data SUSYTools/data
 sed -i "s/^PACKAGE_DEP.*/PACKAGE_DEP = CalibrationDataInterface/" SUSYTools/cmt/Makefile.RootCore
 
 # susy packages
-svn co ${SVN_PHYS}/SUSY/Analyses/WeakProduction/ChargeFlip/tags/ChargeFlip-00-00-19                ChargeFlip
+svn co ${SVN_PHYS}/SUSY/Analyses/WeakProduction/ChargeFlip/tags/ChargeFlip-00-00-19-01             ChargeFlip
 svn co ${SVN_PHYS}/SUSY/Analyses/WeakProduction/DGTriggerReweight/tags/DGTriggerReweight-00-00-29  DGTriggerReweight
 svn co ${SVN_PHYS}/SUSY/Analyses/WeakProduction/HistFitterTree/tags/HistFitterTree-00-00-33        HistFitterTree
 svn co ${SVN_PHYS}/SUSY/Analyses/WeakProduction/LeptonTruthTools/tags/LeptonTruthTools-00-01-07    LeptonTruthTools
